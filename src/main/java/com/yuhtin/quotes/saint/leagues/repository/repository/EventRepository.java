@@ -24,10 +24,19 @@ public final class EventRepository {
                 "id CHAR(8) NOT NULL PRIMARY KEY," +
                 "name CHAR(36) NOT NULL," +
                 "clanTag CHAR(3) NOT NULL," +
+                "eventType CHAR(36) NOT NULL," +
                 "points INT NOT NULL," +
                 "timestamp BIGINT NOT NULL" +
                 "playersInvolved LONGTEXT NOT NULL," +
                 ");"
+        );
+    }
+
+    public Set<LeagueEvent> findAll() {
+        return sqlExecutor.resultManyQuery(
+                "SELECT * FROM " + TABLE,
+                statement -> {},
+                LeagueEventAdapter.class
         );
     }
 
@@ -57,14 +66,15 @@ public final class EventRepository {
 
     public void insert(LeagueEvent leagueEvent) {
         this.sqlExecutor.updateQuery(
-                String.format("REPLACE INTO %s VALUES(?,?,?,?,?,?)", TABLE),
+                String.format("REPLACE INTO %s VALUES(?,?,?,?,?,?,?)", TABLE),
                 statement -> {
                     statement.set(1, leagueEvent.getId());
                     statement.set(2, leagueEvent.getName());
                     statement.set(3, leagueEvent.getClanTag());
-                    statement.set(4, leagueEvent.getPoints());
-                    statement.set(5, leagueEvent.getTimestamp());
-                    statement.set(6, leagueEvent.getPlayersInvolved());
+                    statement.set(4, leagueEvent.getEventType().name());
+                    statement.set(5, leagueEvent.getPoints());
+                    statement.set(6, leagueEvent.getTimestamp());
+                    statement.set(7, leagueEvent.getPlayersInvolved());
                 }
         );
     }
