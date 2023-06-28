@@ -3,6 +3,8 @@ package com.yuhtin.quotes.saint.leagues.cache;
 import com.yuhtin.quotes.saint.leagues.LeaguesPlugin;
 import com.yuhtin.quotes.saint.leagues.model.LeagueClan;
 import com.yuhtin.quotes.saint.leagues.repository.repository.ClanRepository;
+import me.lucko.helper.Schedulers;
+import me.lucko.helper.promise.Promise;
 
 import java.util.*;
 
@@ -19,17 +21,18 @@ public class RankingCache {
         return INSTANCE;
     }
 
-    public void refresh() {
-        ClanRepository clanRepository = LeaguesPlugin.getInstance().getClanRepository();
+    public Promise<Void> refresh() {
+        return Schedulers.sync().run(() -> {
+            ClanRepository clanRepository = LeaguesPlugin.getInstance().getClanRepository();
 
+            Set<LeagueClan> leagueClans = clanRepository.orderByPoints();
+            ranking.clear();
 
-        Set<LeagueClan> leagueClans = clanRepository.orderByPoints();
-        ranking.clear();
-
-        for (LeagueClan clan : leagueClans) {
-            clan.setRankPosition(ranking.size() + 1);
-            ranking.put(clan.getTag(), clan);
-        }
+            for (LeagueClan clan : leagueClans) {
+                clan.setRankPosition(ranking.size() + 1);
+                ranking.put(clan.getTag(), clan);
+            }
+        });
     }
 
     public LeagueClan getByTag(String tag) {
