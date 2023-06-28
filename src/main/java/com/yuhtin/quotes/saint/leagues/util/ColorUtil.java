@@ -1,11 +1,11 @@
 package com.yuhtin.quotes.saint.leagues.util;
 
+import com.sun.istack.internal.NotNull;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.val;
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
-import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -16,7 +16,8 @@ import java.util.stream.Collectors;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class ColorUtil {
 
-    @NotNull public static String colored(@Nullable String message) {
+    @NotNull
+    public static String colored(@Nullable String message) {
         if (message == null) return "";
 
         Pattern pattern = Pattern.compile("&#[a-fA-F0-9]{6}");
