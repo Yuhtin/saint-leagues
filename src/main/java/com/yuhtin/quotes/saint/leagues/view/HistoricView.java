@@ -67,11 +67,11 @@ public class HistoricView extends PagedInventory {
                 return InventoryItem.of(new ItemBuilder(event.getEventType().getMaterial())
                         .name("&a" + event.getName() + " &8(#" + event.getId() + ")")
                         .setLore(
-                                "&fData: &a" + event.getFormattedDate(),
-                                "&fPontos: &a" + event.getPoints(),
+                                "&fData: &e" + event.getFormattedDate(),
+                                "&fPontos: &e" + event.getPoints(),
                                 "",
-                                "&fClan vencedor: &a" + event.getClanTag(),
-                                "&fJogadores do clan: &a" + String.join(", ", playersInvolved)
+                                "&fClan vencedor: &e" + event.getClanTag(),
+                                "&fJogadores do clan: &e" + String.join(", ", playersInvolved)
                         ).wrap());
 
             });
@@ -83,7 +83,7 @@ public class HistoricView extends PagedInventory {
     private InventoryItem sortRankingItem(Viewer viewer) {
         AtomicInteger currentFilter = new AtomicInteger(rankingSorterType.getOrDefault(viewer.getName(), -1));
         return InventoryItem.of(new ItemBuilder(Material.HOPPER)
-                        .name("&bOrdenar ranking")
+                        .name("&6Ordenar ranking")
                         .setLore(
                                 "&7Ordene o ranking da maneira deseja",
                                 "",
@@ -102,7 +102,7 @@ public class HistoricView extends PagedInventory {
     }
 
     private String getColorByFilter(int currentFilter, int loopFilter) {
-        return currentFilter == loopFilter ? " &e▶" : "&8";
+        return currentFilter == loopFilter ? " &b▶" : "&8";
     }
 
 }

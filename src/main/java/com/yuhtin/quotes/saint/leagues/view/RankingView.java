@@ -69,8 +69,8 @@ public class RankingView extends PagedInventory {
                 return InventoryItem.of(new ItemBuilder(itemStack)
                         .name("&a" + clan.getTag() + " &6(#" + clan.getRankPosition() + ")")
                         .setLore(
-                                "&fPontos: &a" + clan.getPoints(),
-                                "&fParticipações em eventos: &a" + clanAppearences
+                                "&fPontos: &e" + clan.getPoints(),
+                                "&fParticipações em eventos: &e" + clanAppearences
                         ).wrap());
 
             });
