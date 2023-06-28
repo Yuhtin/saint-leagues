@@ -1,0 +1,9 @@
+database:
+  type: "sqlite"
+  mysql:
+    address: ""
+    database: ""
+    username: ""
+    password: ""
+  sqlite:
+    file: "database.db"
