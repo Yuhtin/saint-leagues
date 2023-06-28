@@ -1,4 +1,4 @@
-package com.yuhtin.quotes.saint.leagues.repository;
+package com.yuhtin.quotes.saint.leagues.repository.repository;
 
 import com.henryfabio.sqlprovider.executor.SQLExecutor;
 import com.yuhtin.quotes.saint.leagues.model.LeagueEvent;
@@ -31,7 +31,7 @@ public final class EventRepository {
         );
     }
 
-    private Set<LeagueEvent> groupByPlayer(String playerName) {
+    public Set<LeagueEvent> groupByPlayer(String playerName) {
         return sqlExecutor.resultManyQuery(
                 "SELECT * FROM " + TABLE + " WHERE playersInvolved LIKE '%" + playerName + "%'",
                 statement -> {},
@@ -39,7 +39,7 @@ public final class EventRepository {
         );
     }
 
-    private Set<LeagueEvent> groupByClan(String clanTag) {
+    public Set<LeagueEvent> groupByClan(String clanTag) {
         return sqlExecutor.resultManyQuery(
                 "SELECT * FROM " + TABLE + " WHERE clanTag = '" + clanTag + "'",
                 statement -> {},
@@ -47,7 +47,7 @@ public final class EventRepository {
         );
     }
 
-    private LeagueEvent findById(String id) {
+    public LeagueEvent findById(String id) {
         return sqlExecutor.resultOneQuery(
                 "SELECT * FROM " + TABLE + " WHERE id = '" + id + "'",
                 statement -> {},

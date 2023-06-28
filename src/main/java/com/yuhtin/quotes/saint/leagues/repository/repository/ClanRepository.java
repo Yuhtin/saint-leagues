@@ -1,4 +1,4 @@
-package com.yuhtin.quotes.saint.leagues.repository;
+package com.yuhtin.quotes.saint.leagues.repository.repository;
 
 import com.henryfabio.sqlprovider.executor.SQLExecutor;
 import com.yuhtin.quotes.saint.leagues.model.LeagueClan;
@@ -28,7 +28,9 @@ public final class ClanRepository {
         );
     }
 
-    private LeagueEvent findByTag(String tag) {
+    public 
+
+    public LeagueEvent findByTag(String tag) {
         return sqlExecutor.resultOneQuery(
                 "SELECT * FROM " + TABLE + " WHERE clanTag = '" + tag + "'",
                 statement -> {},
