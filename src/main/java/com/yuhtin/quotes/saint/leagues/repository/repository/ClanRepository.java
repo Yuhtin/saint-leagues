@@ -3,6 +3,7 @@ package com.yuhtin.quotes.saint.leagues.repository.repository;
 import com.henryfabio.sqlprovider.executor.SQLExecutor;
 import com.yuhtin.quotes.saint.leagues.model.LeagueClan;
 import com.yuhtin.quotes.saint.leagues.model.LeagueEvent;
+import com.yuhtin.quotes.saint.leagues.repository.adapters.LeagueClanAdapter;
 import com.yuhtin.quotes.saint.leagues.repository.adapters.LeagueEventAdapter;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -28,13 +29,19 @@ public final class ClanRepository {
         );
     }
 
-    public 
+    public Set<LeagueClan> orderByPoints() {
+        return sqlExecutor.resultManyQuery(
+                "SELECT * FROM " + TABLE + " ORDER BY points DESC",
+                statement -> {},
+                LeagueClanAdapter.class
+        );
+    }
 
-    public LeagueEvent findByTag(String tag) {
+    public LeagueClan findByTag(String tag) {
         return sqlExecutor.resultOneQuery(
                 "SELECT * FROM " + TABLE + " WHERE clanTag = '" + tag + "'",
                 statement -> {},
-                LeagueEventAdapter.class
+                LeagueClanAdapter.class
         );
     }
 
