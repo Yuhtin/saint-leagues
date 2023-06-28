@@ -7,3 +7,11 @@ database:
     password: ""
   sqlite:
     file: "database.db"
+
+# Sistema para premiar mensalmente o top clan (1º 2º e 3º lugar)
+auto-reward-top:
+  day: 7
+  hour: 13
+  minute: 0
+
+top-locations: []
