@@ -14,10 +14,11 @@ public class LeagueEventAdapter implements SQLResultAdapter<LeagueEvent> {
         return LeagueEvent.builder()
                 .id(resultSet.get("id"))
                 .name(resultSet.get("name"))
-                .clanTag(resultSet.get("clan_tag"))
+                .clanTag(resultSet.get("clanTag"))
+                .eventType(resultSet.get("eventType"))
                 .points(resultSet.get("points"))
                 .timestamp(resultSet.get("timestamp"))
-                .playersInvolved(resultSet.get("players_involved"))
+                .playersInvolved(resultSet.get("playersInvolved"))
                 .build();
     }
 }
