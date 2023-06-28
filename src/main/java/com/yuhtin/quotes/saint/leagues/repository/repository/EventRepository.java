@@ -3,6 +3,7 @@ package com.yuhtin.quotes.saint.leagues.repository.repository;
 import com.henryfabio.sqlprovider.executor.SQLExecutor;
 import com.yuhtin.quotes.saint.leagues.model.LeagueEvent;
 import com.yuhtin.quotes.saint.leagues.repository.adapters.LeagueEventAdapter;
+import com.yuhtin.quotes.saint.leagues.repository.adapters.EmptyAdapter;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
@@ -48,12 +49,12 @@ public final class EventRepository {
         );
     }
 
-    public Set<LeagueEvent> groupByClan(String clanTag) {
+    public int countClanAppearences(String clanTag) {
         return sqlExecutor.resultManyQuery(
-                "SELECT * FROM " + TABLE + " WHERE clanTag = '" + clanTag + "'",
+                "SELECT COUNT(*) FROM " + TABLE + " WHERE clanTag = '" + clanTag + "'",
                 statement -> {},
-                LeagueEventAdapter.class
-        );
+                EmptyAdapter.class
+        ).size();
     }
 
     public LeagueEvent findById(String id) {
