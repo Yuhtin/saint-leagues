@@ -1,5 +1,6 @@
 package com.yuhtin.quotes.saint.leagues.model;
 
+import com.yuhtin.quotes.saint.leagues.util.DateFormatUtil;
 import lombok.Builder;
 import lombok.Data;
 
@@ -20,6 +21,7 @@ public class LeagueEvent {
     private final String name;
 
     private final String clanTag;
+    private final EventType eventType;
     private final List<String> playersInvolved;
     private final int points;
 
@@ -29,4 +31,7 @@ public class LeagueEvent {
         return UUID.randomUUID().toString().split("-")[0];
     }
 
+    public String getFormattedDate() {
+        return DateFormatUtil.of(timestamp);
+    }
 }
