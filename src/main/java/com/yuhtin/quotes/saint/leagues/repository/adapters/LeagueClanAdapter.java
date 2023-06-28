@@ -13,7 +13,8 @@ public class LeagueClanAdapter implements SQLResultAdapter<LeagueClan> {
     public LeagueClan adaptResult(SimpleResultSet resultSet) {
         return new LeagueClan(
                 resultSet.get("clanTag"),
-                Integer.parseInt(resultSet.get("points"))
+                Integer.parseInt(resultSet.get("points")),
+                -1
         );
     }
 
