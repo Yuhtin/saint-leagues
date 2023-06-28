@@ -31,11 +31,6 @@ public final class EventRepository {
         );
     }
 
-    public void recreateTable() {
-        sqlExecutor.updateQuery("DELETE FROM " + TABLE);
-        createTable();
-    }
-
     private Set<LeagueEvent> groupByPlayer(String playerName) {
         return sqlExecutor.resultManyQuery(
                 "SELECT * FROM " + TABLE + " WHERE playersInvolved LIKE '%" + playerName + "%'",

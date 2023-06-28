@@ -10,6 +10,7 @@ import java.util.List;
 /**
  * @author <a href="https://github.com/Yuhtin">Yuhtin</a>
  */
+@AllArgsConstructor
 @RequiredArgsConstructor
 @Data
 public class LeagueClan {
