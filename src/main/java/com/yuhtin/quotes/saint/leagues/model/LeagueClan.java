@@ -17,5 +17,6 @@ public class LeagueClan {
 
     private final String tag;
     private int points;
+    private int rankPosition;
 
 }
