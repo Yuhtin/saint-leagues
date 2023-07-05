@@ -35,6 +35,7 @@ dependencies {
     compileOnly("com.github.PlaceholderAPI:PlaceholderAPI:2.10.9")
     compileOnly("com.github.decentsoftware-eu:decentholograms:2.8.3")
     compileOnly("net.sacredlabyrinth.phaed.simpleclans:SimpleClans:2.15.2")
+    compileOnly("com.github.RoinujNosde:TitansBattle:6.2.0")
 
     compileOnly("com.mojang:authlib:1.5.25")
 
