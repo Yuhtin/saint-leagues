@@ -39,7 +39,10 @@ dependencies {
 
     compileOnly("com.mojang:authlib:1.5.25")
 
-    implementation("com.github.HenryFabio:inventory-api:2.0.3")
+    compileOnly(fileTree("/libs"))
+
+
+    implementation("com.github.HenryFabio:inventory-api:main-SNAPSHOT")
     implementation("com.github.HenryFabio:sql-provider:9561f20fd2")
 
     compileOnly("org.projectlombok:lombok:1.18.12")
