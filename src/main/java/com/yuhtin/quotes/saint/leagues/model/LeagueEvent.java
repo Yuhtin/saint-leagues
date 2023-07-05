@@ -11,27 +11,26 @@ import java.util.UUID;
  * @author <a href="https://github.com/Yuhtin">Yuhtin</a>
  */
 
-@Builder
 @Data
+@Builder
 public class LeagueEvent {
 
     @Builder.Default
-    private final String id = generateRandomID();
+    private final String id = UUID.randomUUID().toString().split("-")[0];
 
     private final String name;
 
     private final String clanTag;
-    private final EventType eventType;
+    private final LeagueEventType leagueEventType;
     private final List<String> playersInvolved;
     private final int points;
 
-    private final long timestamp;
-
-    protected String generateRandomID() {
-        return UUID.randomUUID().toString().split("-")[0];
-    }
+    @Builder.Default
+    private final long timestamp = System.currentTimeMillis();
 
     public String getFormattedDate() {
         return DateFormatUtil.of(timestamp);
     }
+
 }
+
