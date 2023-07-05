@@ -9,9 +9,80 @@ database:
     file: "database.db"
 
 # Sistema para premiar mensalmente o top clan (1º 2º e 3º lugar)
-auto-reward-top:
+auto-reward:
   day: 7
   hour: 13
-  minute: 0
+
+  # Placeholders: $clanTag $player
+  # Os comandos vão ser executado para cada jogador do clan
+  rewards:
+    1:
+      - 'give $player diamond 15'
+    2:
+      - 'give $player diamond 5'
+    3:
+      - 'give $player diamond 1'
+
+reward-per-event:
+  DragonSlayer:
+    name: "Dragon Slayer"
+    points: 15
+  TitansBattle:
+    gladiador:
+      name: "Gladiador" # não sei qual nome colocar xd
+      points: 15
+    killer:
+      name: "Killer"
+      points: 10
+  yEvents:
+    BOLAO:
+      name: "Bolão"
+      points: 3
+    CORRIDA:
+      name: "Corrida"
+      points: 3
+    FASTCLICK:
+      name: "FastClick"
+      points: 3
+    FIGHT:
+      name: "Fight"
+      points: 3
+    KILLER:
+      name: "Killer"
+      points: 3
+    LABIRINTO:
+      name: "Labirinto"
+      points: 3
+    LOTERIA:
+      name: "Loteria"
+      points: 3
+    MATEMATICA:
+      name: "Matemática"
+      points: 3
+    PAINTBALL:
+      name: "Paintball"
+      points: 3
+    PALAVRA:
+      name: "Palavra"
+      points: 3
+    PARKOUR:
+      name: "Parkour"
+      points: 3
+    QUIZ:
+      name: "Quiz"
+      points: 3
+    SPLEEF:
+      name: "Spleef"
+      points: 3
+    SUMO:
+      name: "Sumo"
+      points: 3
+    RESTAUM:
+      name: "RestaUm"
+      points: 3
+    FASTCRAFT:
+      name: "FastCraft"
+      points: 3
+
 
 top-locations: []
