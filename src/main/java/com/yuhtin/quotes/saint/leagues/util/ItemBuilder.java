@@ -2,6 +2,7 @@ package com.yuhtin.quotes.saint.leagues.util;
 
 import org.bukkit.Color;
 import org.bukkit.Material;
+import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
@@ -69,4 +70,11 @@ public class ItemBuilder {
         return item;
     }
 
+    public ItemBuilder hideAttributes() {
+        return changeItemMeta(it -> {
+            for (ItemFlag value : ItemFlag.values()) {
+                it.addItemFlags(value);
+            }
+        });
+    }
 }
