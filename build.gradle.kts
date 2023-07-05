@@ -34,6 +34,7 @@ dependencies {
     compileOnly("me.lucko:helper:5.6.10")
     compileOnly("com.github.PlaceholderAPI:PlaceholderAPI:2.10.9")
     compileOnly("com.github.decentsoftware-eu:decentholograms:2.8.3")
+    compileOnly("net.sacredlabyrinth.phaed.simpleclans:SimpleClans:2.15.2")
 
     compileOnly("com.mojang:authlib:1.5.25")
 
