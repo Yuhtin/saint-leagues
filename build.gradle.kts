@@ -33,7 +33,7 @@ dependencies {
     compileOnly("org.spigotmc:spigot-api:1.20.1-R0.1-SNAPSHOT")
     compileOnly("me.lucko:helper:5.6.10")
     compileOnly("com.github.PlaceholderAPI:PlaceholderAPI:2.10.9")
-    compileOnly("com.gmail.filoghost.holographicdisplays:holographicdisplays-api:2.4.0")
+    compileOnly("com.github.decentsoftware-eu:decentholograms:2.8.3")
 
     compileOnly("com.mojang:authlib:1.5.25")
 
