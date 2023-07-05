@@ -6,14 +6,16 @@ plugins {
     id("net.minecrell.plugin-yml.bukkit") version "0.5.1"
 }
 
-version = "1.0-SNAPSHOT"
+version = "1.0.0"
 
 bukkit {
     name = "leagues"
     main = "com.yuhtin.quotes.saint.leagues.LeaguesPlugin"
     version = "${project.version}"
     authors = listOf("Yuhtin")
-    softDepend = listOf("PlaceholderAPI", "helper")
+    apiVersion = "1.13"
+    depend = listOf("helper", "SimpleClans", "DecentHolograms")
+    softDepend = listOf("DragonSlayer", "TitansBattle", "yEventos")
 }
 
 
