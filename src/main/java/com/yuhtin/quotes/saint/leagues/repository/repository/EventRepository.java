@@ -2,11 +2,13 @@ package com.yuhtin.quotes.saint.leagues.repository.repository;
 
 import com.henryfabio.sqlprovider.executor.SQLExecutor;
 import com.yuhtin.quotes.saint.leagues.model.LeagueEvent;
+import com.yuhtin.quotes.saint.leagues.model.LeagueEventType;
 import com.yuhtin.quotes.saint.leagues.repository.adapters.LeagueEventAdapter;
 import com.yuhtin.quotes.saint.leagues.repository.adapters.EmptyAdapter;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -24,13 +26,18 @@ public final class EventRepository {
         sqlExecutor.updateQuery("CREATE TABLE IF NOT EXISTS " + TABLE + "(" +
                 "id CHAR(8) NOT NULL PRIMARY KEY," +
                 "name CHAR(36) NOT NULL," +
-                "clanTag CHAR(3) NOT NULL," +
-                "eventType CHAR(36) NOT NULL," +
+                "winner_clan CHAR(3) NOT NULL," +
+                "event_type CHAR(36) NOT NULL," +
                 "points INT NOT NULL," +
-                "timestamp BIGINT NOT NULL" +
-                "playersInvolved LONGTEXT NOT NULL," +
+                "timestamp BIGINT NOT NULL," +
+                "players_involved LONGTEXT NOT NULL" +
                 ");"
         );
+    }
+
+    public void recreateTable() {
+        sqlExecutor.updateQuery("DROP TABLE IF EXISTS " + TABLE);
+        createTable();
     }
 
     public Set<LeagueEvent> findAll() {
@@ -41,9 +48,17 @@ public final class EventRepository {
         );
     }
 
+    public Set<LeagueEvent> groupByType(LeagueEventType type) {
+        return sqlExecutor.resultManyQuery(
+                "SELECT * FROM " + TABLE + " WHERE event_type = '" + type.name() + "'",
+                statement -> {},
+                LeagueEventAdapter.class
+        );
+    }
+
     public Set<LeagueEvent> groupByPlayer(String playerName) {
         return sqlExecutor.resultManyQuery(
-                "SELECT * FROM " + TABLE + " WHERE playersInvolved LIKE '%" + playerName + "%'",
+                "SELECT * FROM " + TABLE + " WHERE players_involved LIKE '%" + playerName + "%'",
                 statement -> {},
                 LeagueEventAdapter.class
         );
@@ -51,7 +66,7 @@ public final class EventRepository {
 
     public int countClanAppearences(String clanTag) {
         return sqlExecutor.resultManyQuery(
-                "SELECT COUNT(*) FROM " + TABLE + " WHERE clanTag = '" + clanTag + "'",
+                "SELECT COUNT(*) FROM " + TABLE + " WHERE winner_clan = '" + clanTag + "'",
                 statement -> {},
                 EmptyAdapter.class
         ).size();
@@ -69,13 +84,15 @@ public final class EventRepository {
         this.sqlExecutor.updateQuery(
                 String.format("REPLACE INTO %s VALUES(?,?,?,?,?,?,?)", TABLE),
                 statement -> {
+                    List<String> playersInvolved = leagueEvent.getPlayersInvolved();
+
                     statement.set(1, leagueEvent.getId());
                     statement.set(2, leagueEvent.getName());
                     statement.set(3, leagueEvent.getClanTag());
-                    statement.set(4, leagueEvent.getEventType().name());
+                    statement.set(4, leagueEvent.getLeagueEventType().name());
                     statement.set(5, leagueEvent.getPoints());
                     statement.set(6, leagueEvent.getTimestamp());
-                    statement.set(7, leagueEvent.getPlayersInvolved());
+                    statement.set(7, String.join(",", playersInvolved));
                 }
         );
     }

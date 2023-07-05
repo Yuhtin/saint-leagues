@@ -29,9 +29,18 @@ public final class ClanRepository {
         );
     }
 
+    public void recreateTable() {
+        sqlExecutor.updateQuery("DROP TABLE IF EXISTS " + TABLE);
+        createTable();
+    }
+
     public Set<LeagueClan> orderByPoints() {
+        return orderByPoints(-1);
+    }
+
+    public Set<LeagueClan> orderByPoints(int limit) {
         return sqlExecutor.resultManyQuery(
-                "SELECT * FROM " + TABLE + " ORDER BY points DESC",
+                "SELECT * FROM " + TABLE + " ORDER BY points DESC" + (limit > 0 ? " LIMIT " + limit : ""),
                 statement -> {},
                 LeagueClanAdapter.class
         );
@@ -40,20 +49,20 @@ public final class ClanRepository {
     public LeagueClan findByTag(String tag) {
         return sqlExecutor.resultOneQuery(
                 "SELECT * FROM " + TABLE + " WHERE clanTag = '" + tag + "'",
-                statement -> {},
+                statement -> {
+                },
                 LeagueClanAdapter.class
         );
     }
 
-    public void insert(LeagueClan leagueClan) {
+    public void insert(String clanTag, int points) {
         this.sqlExecutor.updateQuery(
                 String.format("REPLACE INTO %s VALUES(?,?)", TABLE),
                 statement -> {
-                    statement.set(1, leagueClan.getTag());
-                    statement.set(2, leagueClan.getPoints());
+                    statement.set(1, clanTag);
+                    statement.set(2, points);
                 }
         );
     }
-
 }
 
