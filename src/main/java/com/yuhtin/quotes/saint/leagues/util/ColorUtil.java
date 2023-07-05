@@ -1,11 +1,11 @@
 package com.yuhtin.quotes.saint.leagues.util;
 
-import com.sun.istack.internal.NotNull;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.val;
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
+import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
 import java.util.List;
