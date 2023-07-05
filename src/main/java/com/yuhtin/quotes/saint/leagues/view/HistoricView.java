@@ -8,9 +8,10 @@ import com.henryfabio.minecraft.inventoryapi.item.supplier.InventoryItemSupplier
 import com.henryfabio.minecraft.inventoryapi.viewer.Viewer;
 import com.henryfabio.minecraft.inventoryapi.viewer.configuration.border.Border;
 import com.henryfabio.minecraft.inventoryapi.viewer.impl.paged.PagedViewer;
-import com.sun.istack.internal.NotNull;
+import com.henryfabio.minecraft.inventoryapi.viewer.property.ViewerPropertyMap;
 import com.yuhtin.quotes.saint.leagues.LeaguesPlugin;
 import com.yuhtin.quotes.saint.leagues.model.LeagueEvent;
+import com.yuhtin.quotes.saint.leagues.model.LeagueEventType;
 import com.yuhtin.quotes.saint.leagues.repository.repository.EventRepository;
 import com.yuhtin.quotes.saint.leagues.util.ItemBuilder;
 import lombok.val;
@@ -24,12 +25,10 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class HistoricView extends PagedInventory {
 
-    private final String playerName;
     private final Map<String, Integer> rankingSorterType = new HashMap<>();
 
-    public HistoricView(String playerName) {
-        super("league.historic", "Histórico" + (playerName != null ? " de " + playerName : ""), 5 * 9);
-        this.playerName = playerName;
+    public HistoricView() {
+        super("league.historic", "Historico", 5 * 9);
     }
 
     @Override
@@ -39,6 +38,12 @@ public class HistoricView extends PagedInventory {
         configuration.backInventory("league.main");
         configuration.itemPageLimit(14);
         configuration.border(Border.of(1, 1, 2, 1));
+
+        ViewerPropertyMap propertyMap = viewer.getPropertyMap();
+        String playerName = propertyMap.get("playerName");
+        if (playerName != null) {
+            configuration.titleInventory("Historico de " + playerName);
+        }
     }
 
     @Override
@@ -48,7 +53,7 @@ public class HistoricView extends PagedInventory {
     }
 
     @Override
-    protected void update(@NotNull PagedViewer viewer, @NotNull InventoryEditor editor) {
+    protected void update(PagedViewer viewer, InventoryEditor editor) {
         super.update(viewer, editor);
         configureInventory(viewer, viewer.getEditor());
     }
@@ -56,15 +61,24 @@ public class HistoricView extends PagedInventory {
 
     @Override
     protected List<InventoryItemSupplier> createPageItems(PagedViewer viewer) {
+        String playerName = viewer.getPropertyMap().get("playerName");
+
         EventRepository eventRepository = LeaguesPlugin.getInstance().getEventRepository();
-        Set<LeagueEvent> events = playerName != null ? eventRepository.groupByPlayer(playerName) : eventRepository.findAll();
+        Set<LeagueEvent> events = playerName != null
+                ? eventRepository.groupByPlayer(playerName)
+                : eventRepository.findAll();
+
+        int filterValue = rankingSorterType.getOrDefault(viewer.getName(), -1);
 
         List<InventoryItemSupplier> items = new ArrayList<>();
         for (LeagueEvent event : events) {
+            LeagueEventType leagueEventType = event.getLeagueEventType();
+            if (filterValue != -1 && filterValue != leagueEventType.ordinal()) continue;
+
             items.add(() -> {
 
                 List<String> playersInvolved = event.getPlayersInvolved();
-                return InventoryItem.of(new ItemBuilder(event.getEventType().getMaterial())
+                return InventoryItem.of(new ItemBuilder(event.getLeagueEventType().getMaterial())
                         .name("&a" + event.getName() + " &8(#" + event.getId() + ")")
                         .setLore(
                                 "&fData: &e" + event.getFormattedDate(),

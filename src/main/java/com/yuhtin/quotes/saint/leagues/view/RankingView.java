@@ -8,10 +8,8 @@ import com.henryfabio.minecraft.inventoryapi.item.supplier.InventoryItemSupplier
 import com.henryfabio.minecraft.inventoryapi.viewer.Viewer;
 import com.henryfabio.minecraft.inventoryapi.viewer.configuration.border.Border;
 import com.henryfabio.minecraft.inventoryapi.viewer.impl.paged.PagedViewer;
-import com.sun.istack.internal.NotNull;
 import com.yuhtin.quotes.saint.leagues.LeaguesPlugin;
-import com.yuhtin.quotes.saint.leagues.cache.RankingCache;
-import com.yuhtin.quotes.saint.leagues.model.LeagueClan;
+import com.yuhtin.quotes.saint.leagues.cache.LeagueClanCache;
 import com.yuhtin.quotes.saint.leagues.util.BannerAlphabetic;
 import com.yuhtin.quotes.saint.leagues.util.ItemBuilder;
 import lombok.val;
@@ -44,35 +42,39 @@ public class RankingView extends PagedInventory {
     }
 
     @Override
-    protected void update(@NotNull PagedViewer viewer, @NotNull InventoryEditor editor) {
+    protected void update(PagedViewer viewer, InventoryEditor editor) {
         super.update(viewer, editor);
         configureInventory(viewer, viewer.getEditor());
     }
 
     @Override
     protected List<InventoryItemSupplier> createPageItems(PagedViewer viewer) {
-
+        LeagueClanCache leagueClanCache = LeagueClanCache.getInstance();
         List<InventoryItemSupplier> items = new ArrayList<>();
-        for (LeagueClan clan : RankingCache.getInstance().getRanking()) {
-            items.add(() -> {
 
+        for (String clanTag : leagueClanCache.getRanking()) {
+            items.add(() -> {
                 int clanAppearences = LeaguesPlugin.getInstance()
                         .getEventRepository()
-                        .countClanAppearences(clan.getTag());
+                        .countClanAppearences(clanTag);
 
-                BannerAlphabetic bannerAlphabetic = BannerAlphabetic.bannerByLetter(clan.getTag().charAt(0));
+                BannerAlphabetic bannerAlphabetic = BannerAlphabetic.bannerByLetter(clanTag.charAt(0));
                 if (bannerAlphabetic == null) {
                     bannerAlphabetic = BannerAlphabetic.bannerByLetter('A');
                 }
 
                 ItemStack itemStack = bannerAlphabetic.getBanner();
+
+                int position = leagueClanCache.getPositionByClan(clanTag);
+                int points = leagueClanCache.getPointsByTag(clanTag);
+
                 return InventoryItem.of(new ItemBuilder(itemStack)
-                        .name("&a" + clan.getTag() + " &6(#" + clan.getRankPosition() + ")")
+                        .name("&a" + clanTag + " &6(#" + position + ")")
+                        .hideAttributes()
                         .setLore(
-                                "&fPontos: &e" + clan.getPoints(),
+                                "&fPontos: &e" + points,
                                 "&fParticipações em eventos: &e" + clanAppearences
                         ).wrap());
-
             });
         }
 
