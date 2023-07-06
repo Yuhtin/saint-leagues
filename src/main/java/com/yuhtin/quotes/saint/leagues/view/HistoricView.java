@@ -10,9 +10,12 @@ import com.henryfabio.minecraft.inventoryapi.viewer.configuration.border.Border;
 import com.henryfabio.minecraft.inventoryapi.viewer.impl.paged.PagedViewer;
 import com.henryfabio.minecraft.inventoryapi.viewer.property.ViewerPropertyMap;
 import com.yuhtin.quotes.saint.leagues.LeaguesPlugin;
+import com.yuhtin.quotes.saint.leagues.cache.LeagueClanCache;
+import com.yuhtin.quotes.saint.leagues.model.IntervalTime;
 import com.yuhtin.quotes.saint.leagues.model.LeagueEvent;
 import com.yuhtin.quotes.saint.leagues.model.LeagueEventType;
 import com.yuhtin.quotes.saint.leagues.repository.repository.EventRepository;
+import com.yuhtin.quotes.saint.leagues.repository.repository.TimedClanRepository;
 import com.yuhtin.quotes.saint.leagues.util.ItemBuilder;
 import lombok.val;
 import org.bukkit.Material;
@@ -26,6 +29,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class HistoricView extends PagedInventory {
 
     private final Map<String, Integer> rankingSorterType = new HashMap<>();
+    private final Map<String, Integer> periodSorterType = new HashMap<>();
 
     public HistoricView() {
         super("league.historic", "Historico", 5 * 9);
@@ -50,6 +54,7 @@ public class HistoricView extends PagedInventory {
     protected void configureInventory(Viewer viewer, InventoryEditor editor) {
         editor.setItem(39, sortRankingItem(viewer));
         editor.setItem(40, DefaultItem.BACK.toInventoryItem(viewer));
+        editor.setItem(41, periodFilter(viewer));
     }
 
     @Override
@@ -63,10 +68,14 @@ public class HistoricView extends PagedInventory {
     protected List<InventoryItemSupplier> createPageItems(PagedViewer viewer) {
         String playerName = viewer.getPropertyMap().get("playerName");
 
+        int periodFilter = periodSorterType.getOrDefault(viewer.getName(), 0);
+        IntervalTime intervalTime = IntervalTime.values()[periodFilter];
+        TimedClanRepository timedRepository = LeagueClanCache.getInstance().getRepository(intervalTime);
+
         EventRepository eventRepository = LeaguesPlugin.getInstance().getEventRepository();
         Set<LeagueEvent> events = playerName != null
-                ? eventRepository.groupByPlayer(playerName)
-                : eventRepository.findAll();
+                ? eventRepository.groupByPlayer(playerName, timedRepository)
+                : eventRepository.findAll(timedRepository);
 
         int filterValue = rankingSorterType.getOrDefault(viewer.getName(), -1);
 
@@ -92,6 +101,26 @@ public class HistoricView extends PagedInventory {
         }
 
         return items;
+    }
+
+    private InventoryItem periodFilter(Viewer viewer) {
+        AtomicInteger currentFilter = new AtomicInteger(periodSorterType.getOrDefault(viewer.getName(), 0));
+
+        return InventoryItem.of(new ItemBuilder(Material.SUNFLOWER)
+                        .name("&6Selecionar período")
+                        .setLore(
+                                "&7Selecione o período que deseja ver",
+                                "",
+                                getColorByFilter(currentFilter.get(), 0) + " Mensal",
+                                getColorByFilter(currentFilter.get(), 1) + " Trimestral",
+                                "",
+                                "&aClique para mudar o período."
+                        )
+                        .wrap())
+                .defaultCallback(event -> {
+                    periodSorterType.put(viewer.getName(), currentFilter.incrementAndGet() > 1 ? 0 : currentFilter.get());
+                    event.updateInventory();
+                });
     }
 
     private InventoryItem sortRankingItem(Viewer viewer) {

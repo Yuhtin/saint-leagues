@@ -1,6 +1,7 @@
 package com.yuhtin.quotes.saint.leagues.repository.repository;
 
 import com.henryfabio.sqlprovider.executor.SQLExecutor;
+import com.yuhtin.quotes.saint.leagues.model.IntervalTime;
 import com.yuhtin.quotes.saint.leagues.model.LeagueEvent;
 import com.yuhtin.quotes.saint.leagues.model.LeagueEventType;
 import com.yuhtin.quotes.saint.leagues.repository.adapters.LeagueEventAdapter;
@@ -40,9 +41,11 @@ public final class EventRepository {
         createTable();
     }
 
-    public Set<LeagueEvent> findAll() {
+    public Set<LeagueEvent> findAll(TimedClanRepository timedRepository) {
         return sqlExecutor.resultManyQuery(
-                "SELECT * FROM " + TABLE,
+                "SELECT * FROM " + TABLE
+                        + " WHERE timestamp >= " + timedRepository.getInitialTime()
+                        + " AND timestamp <= " + timedRepository.getFinalTime(),
                 statement -> {},
                 LeagueEventAdapter.class
         );
@@ -56,9 +59,12 @@ public final class EventRepository {
         );
     }
 
-    public Set<LeagueEvent> groupByPlayer(String playerName) {
+    public Set<LeagueEvent> groupByPlayer(String playerName, TimedClanRepository timedRepository) {
         return sqlExecutor.resultManyQuery(
-                "SELECT * FROM " + TABLE + " WHERE players_involved LIKE '%" + playerName + "%'",
+                "SELECT * FROM " + TABLE
+                        + " WHERE players_involved LIKE '%" + playerName + "%'"
+                        + " AND timestamp >= " + timedRepository.getInitialTime()
+                        + " AND timestamp <= " + timedRepository.getFinalTime(),
                 statement -> {},
                 LeagueEventAdapter.class
         );
@@ -66,15 +72,19 @@ public final class EventRepository {
 
     public int countClanAppearences(String clanTag) {
         return sqlExecutor.resultManyQuery(
-                "SELECT COUNT(*) FROM " + TABLE + " WHERE winner_clan = '" + clanTag + "'",
+                "SELECT COUNT(*) FROM " + TABLE
+                        + " WHERE winner_clan = '" + clanTag + "'",
                 statement -> {},
                 EmptyAdapter.class
         ).size();
     }
 
-    public LeagueEvent findById(String id) {
-        return sqlExecutor.resultOneQuery(
-                "SELECT * FROM " + TABLE + " WHERE id = '" + id + "'",
+    public Set<LeagueEvent> findByClanInInterval(String clanTag, long start, long end) {
+        return sqlExecutor.resultManyQuery(
+                "SELECT * FROM " + TABLE
+                        + " WHERE winner_clan = '" + clanTag
+                        + "' AND timestamp >= " + start
+                        + " AND timestamp <= " + end,
                 statement -> {},
                 LeagueEventAdapter.class
         );

@@ -3,15 +3,17 @@ package com.yuhtin.quotes.saint.leagues;
 import com.henryfabio.minecraft.inventoryapi.manager.InventoryManager;
 import com.henryfabio.sqlprovider.connector.SQLConnector;
 import com.henryfabio.sqlprovider.executor.SQLExecutor;
+import com.yuhtin.quotes.saint.leagues.cache.LeagueClanCache;
 import com.yuhtin.quotes.saint.leagues.cache.ViewCache;
 import com.yuhtin.quotes.saint.leagues.command.LeagueClanCommand;
 import com.yuhtin.quotes.saint.leagues.hook.HookModule;
 import com.yuhtin.quotes.saint.leagues.manager.SimpleClansAccessor;
+import com.yuhtin.quotes.saint.leagues.model.IntervalTime;
 import com.yuhtin.quotes.saint.leagues.module.AutoRewardModule;
 import com.yuhtin.quotes.saint.leagues.module.RankingModule;
 import com.yuhtin.quotes.saint.leagues.repository.SQLProvider;
-import com.yuhtin.quotes.saint.leagues.repository.repository.ClanRepository;
 import com.yuhtin.quotes.saint.leagues.repository.repository.EventRepository;
+import com.yuhtin.quotes.saint.leagues.repository.repository.TimedClanRepository;
 import lombok.Getter;
 import me.lucko.helper.plugin.ExtendedJavaPlugin;
 import org.bukkit.Bukkit;
@@ -26,7 +28,6 @@ public class LeaguesPlugin extends ExtendedJavaPlugin {
     private final ViewCache viewCache = new ViewCache();
 
     private RankingModule rankingModule;
-    private ClanRepository clanRepository;
     private EventRepository eventRepository;
 
     @Override
@@ -46,7 +47,7 @@ public class LeaguesPlugin extends ExtendedJavaPlugin {
         bindModule(new LeagueClanCommand(this));
         bindModule(new HookModule(this));
 
-        this.rankingModule = new RankingModule(this);
+        this.rankingModule = new RankingModule(this, LeagueClanCache.getInstance());
         bindModule(rankingModule);
 
         getLogger().info("Plugin enabled!");
@@ -61,13 +62,30 @@ public class LeaguesPlugin extends ExtendedJavaPlugin {
         SQLConnector sqlConnector = SQLProvider.of(this).setup(null);
         SQLExecutor sqlExecutor = new SQLExecutor(sqlConnector);
 
-        clanRepository = new ClanRepository(sqlExecutor);
         eventRepository = new EventRepository(sqlExecutor);
-
-        clanRepository.createTable();
         eventRepository.createTable();
 
+        initCache(sqlExecutor);
+
         getLogger().info("Database initialized!");
+    }
+
+    private void initCache(SQLExecutor sqlExecutor) {
+        for (IntervalTime time : IntervalTime.values()) {
+            long initialTime = getConfig().getLong("initial-time." + time.name().toUpperCase(), -1);
+            if (initialTime == -1) {
+                initialTime = System.currentTimeMillis();
+
+                getConfig().set("initial-time." + time.name().toUpperCase(), initialTime);
+                saveConfig();
+            }
+
+            TimedClanRepository repository = new TimedClanRepository(sqlExecutor, time);
+            repository.createTable();
+            repository.setInitialTime(initialTime);
+
+            LeagueClanCache.getInstance().register(time, repository);
+        }
     }
 
     public static LeaguesPlugin getInstance() {

@@ -4,6 +4,7 @@ import com.google.common.collect.Lists;
 import com.yuhtin.quotes.saint.leagues.LeaguesPlugin;
 import com.yuhtin.quotes.saint.leagues.cache.LeagueClanCache;
 import com.yuhtin.quotes.saint.leagues.model.LeagueClan;
+import com.yuhtin.quotes.saint.leagues.repository.repository.TimedClanRepository;
 import eu.decentsoftware.holograms.api.DHAPI;
 import eu.decentsoftware.holograms.api.DecentHologramsAPI;
 import eu.decentsoftware.holograms.api.holograms.Hologram;
@@ -63,7 +64,8 @@ public class RankingModule implements TerminableModule {
     };
 
 
-    private final LeaguesPlugin plugin;
+    private final LeaguesPlugin instance;
+    private final LeagueClanCache cache;
 
     @Override
     public void setup(@Nonnull TerminableConsumer consumer) {
@@ -77,47 +79,51 @@ public class RankingModule implements TerminableModule {
 
     public void refreshRanking() {
         long start = System.currentTimeMillis();
-        plugin.getLogger().info("Atualizando ranking...");
+        instance.getLogger().info("Atualizando ranking...");
 
-        LeagueClanCache.getInstance().refresh().thenRunSync(() -> {
+        cache.refresh().thenRunSync(() -> {
             long rankingUpdates = System.currentTimeMillis();
-            plugin.getLogger().info("Ranking atualizado em " + (rankingUpdates - start) + "ms");
 
-            plugin.getLogger().info("Atualizando stands e hologramas...");
+            instance.getLogger().info("Ranking atualizado em " + (rankingUpdates - start) + "ms");
+            instance.getLogger().info("Atualizando stands e hologramas...");
+
             clearStands();
 
-            LeaguesPlugin instance = LeaguesPlugin.getInstance();
-            ConfigurationSection section = instance.getConfig().getConfigurationSection("ranking.position");
-            if (section == null) {
-                instance.getLogger().warning("Ranking position section is null");
-                return;
+            for (TimedClanRepository repository : cache.getRepositories().values()) {
+                String path = "ranking.position." + repository.getIntervalTime().name();
+
+                ConfigurationSection section = instance.getConfig().getConfigurationSection(path);
+                if (section == null) {
+                    instance.getLogger().warning("Ranking position section is null");
+                    return;
+                }
+
+                for (String key : section.getKeys(false)) {
+                    int position = Integer.parseInt(key);
+
+                    LeagueClan clan = repository.getByPosition(position - 1);
+                    if (clan == null) break;
+
+                    String locationString = section.getString(key);
+                    if (locationString == null) continue;
+
+                    String[] split = locationString.split(",");
+                    Location location = new Location(
+                            Bukkit.getWorld(split[0]),
+                            Double.parseDouble(split[1]),
+                            Double.parseDouble(split[2]),
+                            Double.parseDouble(split[3]),
+                            Float.parseFloat(split[4]),
+                            Float.parseFloat(split[5])
+                    );
+
+                    if (location.getWorld() == null) continue;
+
+                    updateRanking(clan, location, position);
+                }
             }
 
-            for (String key : section.getKeys(false)) {
-                int position = Integer.parseInt(key);
-
-                LeagueClan clan = LeagueClanCache.getInstance().getByPosition(position - 1);
-                if (clan == null) break;
-
-                String locationString = section.getString(key);
-                if (locationString == null) continue;
-
-                String[] split = locationString.split(",");
-                Location location = new Location(
-                        Bukkit.getWorld(split[0]),
-                        Double.parseDouble(split[1]),
-                        Double.parseDouble(split[2]),
-                        Double.parseDouble(split[3]),
-                        Float.parseFloat(split[4]),
-                        Float.parseFloat(split[5])
-                );
-
-                if (location.getWorld() == null) continue;
-
-                updateRanking(clan, location, position);
-            }
-
-            plugin.getLogger().info("Stands e hologramas atualizados em " + (System.currentTimeMillis() - rankingUpdates) + "ms");
+            instance.getLogger().info("Stands e hologramas atualizados em " + (System.currentTimeMillis() - rankingUpdates) + "ms");
         });
     }
 
@@ -154,7 +160,7 @@ public class RankingModule implements TerminableModule {
         ArmorStand stand = location.getWorld().spawn(location, ArmorStand.class);
 
         stand.setVisible(false);
-        stand.setMetadata("saintleagues", new FixedMetadataValue(plugin, true));
+        stand.setMetadata("saintleagues", new FixedMetadataValue(instance, true));
         stand.setSmall(true);
         stand.setCustomNameVisible(false);
         stand.setGravity(false);

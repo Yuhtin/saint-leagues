@@ -7,10 +7,14 @@ import com.henryfabio.minecraft.inventoryapi.viewer.Viewer;
 import com.yuhtin.quotes.saint.leagues.LeaguesPlugin;
 import com.yuhtin.quotes.saint.leagues.cache.LeagueClanCache;
 import com.yuhtin.quotes.saint.leagues.cache.ViewCache;
+import com.yuhtin.quotes.saint.leagues.model.IntervalTime;
 import com.yuhtin.quotes.saint.leagues.model.LeagueEvent;
+import com.yuhtin.quotes.saint.leagues.repository.repository.TimedClanRepository;
 import com.yuhtin.quotes.saint.leagues.util.ItemBuilder;
-import org.bukkit.Material;
 import org.bukkit.entity.Player;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author <a href="https://github.com/Yuhtin">Yuhtin</a>
@@ -20,48 +24,71 @@ public class LeagueView extends SimpleInventory {
     private final ViewCache viewCache;
 
     public LeagueView(ViewCache viewCache) {
-        super("league.main", "Liga", 3 * 9);
+        super("league.main", "Saints Ligas", 3 * 9);
         this.viewCache = viewCache;
     }
 
     @Override
     protected void configureInventory(Viewer viewer, InventoryEditor editor) {
         LeaguesPlugin instance = LeaguesPlugin.getInstance();
+        LeagueClanCache cache = LeagueClanCache.getInstance();
 
         Player player = viewer.getPlayer();
         String clanTag = instance.getSimpleClansAccessor().getClanTag(player);
 
         int playerPoints = instance.getEventRepository()
-                .groupByPlayer(player.getName())
+                .groupByPlayer(player.getName(), cache.getRepository(IntervalTime.MENSAL))
                 .stream()
                 .map(LeagueEvent::getPoints)
                 .reduce(0, Integer::sum);
 
-        String clanLore = "&fSeu clan: &cNenhum";
-        if (clanTag != null) {
-            int points = LeagueClanCache.getInstance().getPointsByTag(clanTag);
-            int position = LeagueClanCache.getInstance().getPositionByClan(clanTag);
+        List<String> lore = new ArrayList<>();
+        lore.add("&fSeus pontos: &e" + playerPoints);
 
-            clanLore = "&fSeu clan: &e" + clanTag + " &8| &e" + points + " pontos &6(#" + position + ")";
+        if (clanTag == null) {
+            lore.add("&fSeu clan: &cNenhum");
+        } else {
+            lore.add("&fSeu clan: &e" + clanTag);
+            lore.add("");
+
+            for (IntervalTime time : IntervalTime.values()) {
+                TimedClanRepository repository = cache.getRepository(time);
+
+                int points = repository.getPointsByTag(clanTag);
+                int position = repository.getPositionByClan(clanTag);
+
+                lore.add(" &f" + time.fancyName() + ": &e" + points + " pontos &6(#" + position + ")");
+            }
         }
 
-        editor.setItem(12, InventoryItem.of(new ItemBuilder(player.getName())
+        lore.add("");
+        lore.add("&aClique para ver os eventos que participou!");
+
+        editor.setItem(11, InventoryItem.of(new ItemBuilder(player.getName())
                         .name("&aSeu Perfil")
+                        .setLore(lore)
+                        .wrap())
+                .defaultCallback(callback -> viewCache.getHistoricView().openInventory(
+                        player,
+                        $ -> $.getPropertyMap().set("playerName", player.getName())
+                ))
+        );
+
+        editor.setItem(13, InventoryItem.of(new ItemBuilder("a2629f2682dcee30f5855b1e5427cc4bee73d18a276fafc520d693b40ca81b22")
+                        .name("&aRecompensas")
                         .setLore(
-                                clanLore,
-                                "&fSeus pontos: &e" + playerPoints,
+                                "&7Veja as recompensas que o clan",
+                                "&7pode receber ao final da liga",
                                 "",
-                                "&aClique para ver os eventos que participou!"
+                                "&aClique para ver as recompensas!"
                         ).wrap())
                 .defaultCallback(callback -> {
-                    viewCache.getHistoricView().openInventory(
-                            player,
-                            $ -> $.getPropertyMap().set("playerName", player.getName())
-                    );
+                    player.closeInventory();
+                    player.performCommand("ligarewards");
                 })
         );
 
-        editor.setItem(14, InventoryItem.of(new ItemBuilder(Material.NETHER_STAR)
+        editor.setItem(14, InventoryItem.of(new ItemBuilder("e34a592a79397a8df3997c43091694fc2fb76c883a76cce89f0227e5c9f1dfe")
                         .name("&aRanking da liga")
                         .setLore(
                                 "&7Veja quais clans estão liderando",
@@ -72,7 +99,8 @@ public class LeagueView extends SimpleInventory {
                 .defaultCallback(callback -> viewCache.getRankingView().openInventory(player))
         );
 
-        editor.setItem(15, InventoryItem.of(new ItemBuilder(Material.CYAN_BANNER).name("&aHistórico de Eventos")
+        editor.setItem(15, InventoryItem.of(new ItemBuilder("ab527a18dec3d6dac532f5555b9119c31b7a8397b8a06d249d0eb39241c5485f")
+                .name("&aHistórico de Eventos")
                 .setLore(
                         "&7Veja os eventos anteriores que",
                         "&7ocorream na liga e quantos",

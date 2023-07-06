@@ -1,12 +1,16 @@
 package com.yuhtin.quotes.saint.leagues.cache;
 
-import com.yuhtin.quotes.saint.leagues.LeaguesPlugin;
+import com.yuhtin.quotes.saint.leagues.model.IntervalTime;
 import com.yuhtin.quotes.saint.leagues.model.LeagueClan;
-import com.yuhtin.quotes.saint.leagues.repository.repository.ClanRepository;
+import com.yuhtin.quotes.saint.leagues.module.DiscordAlertSender;
+import com.yuhtin.quotes.saint.leagues.repository.repository.TimedClanRepository;
+import lombok.Getter;
 import me.lucko.helper.Schedulers;
 import me.lucko.helper.promise.Promise;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Set;
 
 /**
  * @author <a href="https://github.com/Yuhtin">Yuhtin</a>
@@ -15,8 +19,8 @@ public class LeagueClanCache {
 
     public static final LeagueClanCache INSTANCE = new LeagueClanCache();
 
-    private final HashMap<String, Integer> clanPoints = new HashMap<>();
-    private final List<String> ranking = new ArrayList<>();
+    @Getter
+    private final HashMap<IntervalTime, TimedClanRepository> repositories = new HashMap<>();
 
     public static LeagueClanCache getInstance() {
         return INSTANCE;
@@ -24,59 +28,57 @@ public class LeagueClanCache {
 
     public Promise<Void> refresh() {
         return Schedulers.sync().run(() -> {
-            ClanRepository clanRepository = LeaguesPlugin.getInstance().getClanRepository();
+            for (TimedClanRepository repository : repositories.values()) {
+                Set<LeagueClan> leagueClans = repository.orderByPoints();
+                repository.getRanking().clear();
 
-            Set<LeagueClan> leagueClans = clanRepository.orderByPoints();
-            ranking.clear();
-
-            for (LeagueClan clan : leagueClans) {
-                ranking.add(clan.getTag());
+                for (LeagueClan clan : leagueClans) {
+                    repository.getRanking().add(clan.getTag());
+                }
             }
         });
     }
 
-    public void addPoints(String tag, int points) {
-        int currentPoints = getPointsByTag(tag) + points;
-        setClanPoints(tag, currentPoints);
+    public int getPositionByClan(IntervalTime interval, String tag) {
+        return getRepository(interval).getPositionByClan(tag);
     }
 
-    public void setClanPoints(String tag, int points) {
-        clanPoints.put(tag, points);
-        LeaguesPlugin.getInstance().getClanRepository().insert(tag, points);
+    public int getPointsByTag(IntervalTime interval, String tag) {
+        return getRepository(interval).getPointsByTag(tag);
     }
 
-    public int getPointsByTag(String tag) {
-        if (tag == null) return -1;
-        if (clanPoints.containsKey(tag)) return clanPoints.get(tag);
+    public void addPoints(IntervalTime interval, String tag, int points) {
+        TimedClanRepository repository = getRepository(interval);
+        int currentPoints = repository.getPointsByTag(tag) + points;
 
-        ClanRepository clanRepository = LeaguesPlugin.getInstance().getClanRepository();
-        LeagueClan clan = clanRepository.findByTag(tag);
-        if (clan == null) {
-            clan = new LeagueClan(tag, 0);
-            clanRepository.insert(tag, 0);
+        repository.getCache().put(tag, currentPoints);
+        repository.insert(tag, currentPoints);
+    }
+
+    public void addPoints(String tag, int points, String motive) {
+        for (TimedClanRepository repository : repositories.values()) {
+            int currentPoints = repository.getPointsByTag(tag) + points;
+
+            repository.getCache().put(tag, currentPoints);
+            repository.insert(tag, currentPoints);
         }
 
-        clanPoints.put(tag, clan.getPoints());
-        return clan.getPoints();
+        DiscordAlertSender.of(tag, points, motive).send();
     }
 
-    public int getPositionByClan(String tag) {
-        if (!ranking.contains(tag)) {
-            ranking.add(tag);
-        }
-
-        return ranking.indexOf(tag) + 1;
+    public LeagueClan getByPosition(IntervalTime interval, int position) {
+        return getRepository(interval).getByPosition(position);
     }
 
-    public LeagueClan getByPosition(int position) {
-        if (ranking.size() <= position) return null;
-
-        String tag = ranking.get(position);
-        return new LeagueClan(tag, getPointsByTag(tag));
+    public Collection<String> getRanking(IntervalTime intervalTime) {
+        return repositories.get(intervalTime).getRanking();
     }
 
-    public Collection<String> getRanking() {
-        return ranking;
+    public TimedClanRepository getRepository(IntervalTime intervalTime) {
+        return repositories.get(intervalTime);
     }
 
+    public void register(IntervalTime time, TimedClanRepository repository) {
+        repositories.put(time, repository);
+    }
 }

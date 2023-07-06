@@ -2,6 +2,7 @@ package com.yuhtin.quotes.saint.leagues.command;
 
 import com.yuhtin.quotes.saint.leagues.LeaguesPlugin;
 import com.yuhtin.quotes.saint.leagues.cache.LeagueClanCache;
+import com.yuhtin.quotes.saint.leagues.model.IntervalTime;
 import lombok.AllArgsConstructor;
 import me.lucko.helper.Commands;
 import me.lucko.helper.terminable.TerminableConsumer;
@@ -30,34 +31,30 @@ public class LeagueClanCommand implements TerminableModule {
 
         Commands.create()
                 .assertPermission("league.admin")
-                .assertUsage("<add/remove> <clan> <pontos>")
+                .assertUsage("<add/remove> <clan> <pontos> [mensal/trimestral]")
                 .handler(context -> {
                     String action = context.arg(0).parseOrFail(String.class);
                     String clanTag = context.arg(1).parseOrFail(String.class).toUpperCase();
+
                     int points = Math.max(0, context.arg(2).parseOrFail(Integer.class));
+                    int total = action.equalsIgnoreCase("remove") ? points * -1 : points;
 
-                    int currentPoints = LeagueClanCache.getInstance().getPointsByTag(clanTag);
-                    if (currentPoints == -1) {
-                        context.reply("&cClan não encontrado!");
-                        return;
-                    }
+                    IntervalTime time = IntervalTime.valueOf(context.arg(3)
+                            .parse(String.class)
+                            .orElse("mensal")
+                            .toUpperCase());
 
-                    if (action.equalsIgnoreCase("add")) {
-                        currentPoints += points;
-                    } else {
-                        currentPoints -= points;
-                    }
+                    LeagueClanCache cache = LeagueClanCache.getInstance();
+                    cache.addPoints(time, clanTag, total);
 
-                    currentPoints = Math.max(currentPoints, 0);
-                    LeagueClanCache.getInstance().setClanPoints(clanTag, currentPoints);
-
-                    context.reply("&aClan &f" + clanTag + " &aagora possui &f" + currentPoints + " &apontos!");
+                    int current = cache.getPointsByTag(time, clanTag);
+                    context.reply("&aClan &f" + clanTag + " &aagora possui &f" + current + " &apontos!");
                 }).registerAndBind(consumer, "ligaadm");
 
         Commands.create()
                 .assertPlayer()
                 .assertPermission("league.admin")
-                .assertUsage("<posição>")
+                .assertUsage("<posição> <mensal/trimestral>")
                 .handler(context -> {
                     String action = context.arg(0).parseOrFail(String.class);
                     if (action.equalsIgnoreCase("reload")) {
@@ -73,6 +70,11 @@ public class LeagueClanCommand implements TerminableModule {
                         return;
                     }
 
+                    IntervalTime time = IntervalTime.valueOf(context.arg(1)
+                            .parse(String.class)
+                            .orElse("mensal")
+                            .toUpperCase());
+
                     Player player = context.sender();
 
                     Location location = player.getLocation();
@@ -83,10 +85,10 @@ public class LeagueClanCommand implements TerminableModule {
                             + location.getYaw() + ","
                             + location.getPitch();
 
-                    instance.getConfig().set("ranking.position." + position, locationString);
+                    instance.getConfig().set("ranking.position." + time.name() + "." + position, locationString);
                     instance.saveConfig();
 
-                    context.reply("&aVocê definiu a posição " + position + " do ranking!");
+                    context.reply("&aVocê definiu a posição #" + position + " do ranking " + time.fancyName() + "!");
                 }).registerAndBind(consumer, "ligasetranking");
 
     }
