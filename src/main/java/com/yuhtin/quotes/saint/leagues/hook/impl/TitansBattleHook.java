@@ -67,7 +67,7 @@ public class TitansBattleHook extends LeagueEventHook {
                             .build();
 
                     instance.getEventRepository().insert(leagueEvent);
-                    LeagueClanCache.getInstance().addPoints(clanTag, points);
+                    LeagueClanCache.getInstance().addPoints(clanTag, points, name);
 
                     instance.getLogger().info("[TitansBattle] Vitória de " + clanTag + " (+ " + points + " pontos)");
                 }).bindWith(consumer);

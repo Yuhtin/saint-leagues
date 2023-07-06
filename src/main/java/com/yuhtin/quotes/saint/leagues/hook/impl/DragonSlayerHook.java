@@ -64,7 +64,7 @@ public class DragonSlayerHook extends LeagueEventHook {
                             .build();
 
                     instance.getEventRepository().insert(leagueEvent);
-                    LeagueClanCache.getInstance().addPoints(clanTag, points);
+                    LeagueClanCache.getInstance().addPoints(clanTag, points, eventName);
 
                     instance.getLogger().info("[DragonSlayer] Vitória de " + player.getName() + " [" + clanTag + "] (+ " + points + " pontos)");
                 }).registerAndBind(consumer, "dragonslayerkill");
