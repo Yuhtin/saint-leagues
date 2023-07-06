@@ -30,6 +30,9 @@ auto-reward:
       - 'give $player diamond 1'
 
 reward-per-event:
+  Vote:
+    name: "Votar"
+    points: 1
   DragonSlayer:
     name: "Dragon Slayer"
     points: 15
