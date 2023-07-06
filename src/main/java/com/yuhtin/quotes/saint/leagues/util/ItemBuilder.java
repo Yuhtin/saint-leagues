@@ -1,5 +1,9 @@
 package com.yuhtin.quotes.saint.leagues.util;
 
+import com.mojang.authlib.GameProfile;
+import com.mojang.authlib.properties.Property;
+import com.mojang.authlib.properties.PropertyMap;
+import org.apache.commons.codec.binary.Base64;
 import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemFlag;
@@ -10,6 +14,7 @@ import org.bukkit.inventory.meta.SkullMeta;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 import java.util.function.Consumer;
 
 public class ItemBuilder {
@@ -30,13 +35,28 @@ public class ItemBuilder {
         this(new ItemStack(type, 1, (short) data));
     }
 
-    public ItemBuilder(String name) {
-        item = SKULL_ITEM.clone();
+    public ItemBuilder(String link) {
+        if (!link.contains("http")) {
+            link = "http://textures.minecraft.net/texture/" + link;
+        }
 
-        SkullMeta meta = (SkullMeta) item.getItemMeta();
-        meta.setOwner(name);
+        GameProfile profile = new GameProfile(UUID.randomUUID(), null);
+        PropertyMap propertyMap = profile.getProperties();
+        if (propertyMap == null) {
+            throw new IllegalStateException("Profile doesn't contain a property map");
+        }
 
-        item.setItemMeta(meta);
+        byte[] encodedData = new Base64().encode(String.format("{textures:{SKIN:{url:\"%s\"}}}", link).getBytes());
+        propertyMap.put("textures", new Property("textures", new String(encodedData)));
+
+        item = new ItemStack(Material.PLAYER_HEAD);
+
+        ItemMeta headMeta = item.getItemMeta();
+        Class<?> headMetaClass = headMeta.getClass();
+
+        Reflections.getField(headMetaClass, "profile", GameProfile.class).set(headMeta, profile);
+
+        item.setItemMeta(headMeta);
     }
 
     public ItemBuilder(Material type, Color color) {
