@@ -56,7 +56,7 @@ public class AutoRewardModule implements TerminableModule {
             }
 
             for (String player : clanPlayers) {
-                for (String command : instance.getConfig().getStringList("auto-reward.rewards." + i)) {
+                for (String command : instance.getConfig().getStringList("auto-reward." + repository.getIntervalTime().name() + "." + i)) {
                     Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command
                             .replace("$player", player)
                             .replace("$clanTag", leagueClan.getTag())

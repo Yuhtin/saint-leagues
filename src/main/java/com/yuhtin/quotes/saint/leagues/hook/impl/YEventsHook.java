@@ -66,7 +66,7 @@ public class YEventsHook extends LeagueEventHook {
                             .build();
 
                     instance.getEventRepository().insert(leagueEvent);
-                    LeagueClanCache.getInstance().addPoints(clanTag, points, eventName);
+                    LeagueClanCache.getInstance().addPoints(clanTag, points, "vencer o evento " + eventName);
 
                     instance.getLogger().info("[yEventos] [" + eventName + "] Vitória de " + player.getName() + " [" + clanTag + "] (+ " + points + " pontos)");
                 }).bindWith(consumer);

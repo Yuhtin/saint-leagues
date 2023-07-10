@@ -102,14 +102,14 @@ public class RankingView extends PagedInventory {
         AtomicInteger currentFilter = new AtomicInteger(sorterType.getOrDefault(viewer.getName(), 0));
 
         return InventoryItem.of(new ItemBuilder(Material.SUNFLOWER)
-                        .name("&6Ordenar ranking")
+                        .name("&6Selecionar período")
                         .setLore(
-                                "&7Ordene o ranking da maneira deseja",
+                                "&7Selecione o período que deseja ver",
                                 "",
                                 getColorByFilter(currentFilter.get(), 0) + " Mensal",
                                 getColorByFilter(currentFilter.get(), 1) + " Trimestral",
                                 "",
-                                "&aClique para mudar o tipo de ordenação."
+                                "&aClique para mudar o período."
                         )
                         .wrap())
                 .defaultCallback(event -> {

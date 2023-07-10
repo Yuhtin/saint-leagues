@@ -24,7 +24,7 @@ public class LeagueView extends SimpleInventory {
     private final ViewCache viewCache;
 
     public LeagueView(ViewCache viewCache) {
-        super("league.main", "Saints Ligas", 3 * 9);
+        super("league.main", "Saint Ligas", 3 * 9);
         this.viewCache = viewCache;
     }
 
@@ -74,7 +74,7 @@ public class LeagueView extends SimpleInventory {
                 ))
         );
 
-        editor.setItem(13, InventoryItem.of(new ItemBuilder("a2629f2682dcee30f5855b1e5427cc4bee73d18a276fafc520d693b40ca81b22")
+        editor.setItem(13, InventoryItem.of(new ItemBuilder("/texture/a2629f2682dcee30f5855b1e5427cc4bee73d18a276fafc520d693b40ca81b22")
                         .name("&aRecompensas")
                         .setLore(
                                 "&7Veja as recompensas que o clan",
@@ -84,11 +84,11 @@ public class LeagueView extends SimpleInventory {
                         ).wrap())
                 .defaultCallback(callback -> {
                     player.closeInventory();
-                    player.performCommand("ligarewards");
+                    player.chat("/ligarewards");
                 })
         );
 
-        editor.setItem(14, InventoryItem.of(new ItemBuilder("e34a592a79397a8df3997c43091694fc2fb76c883a76cce89f0227e5c9f1dfe")
+        editor.setItem(14, InventoryItem.of(new ItemBuilder("/texture/e34a592a79397a8df3997c43091694fc2fb76c883a76cce89f0227e5c9f1dfe")
                         .name("&aRanking da liga")
                         .setLore(
                                 "&7Veja quais clans estão liderando",
@@ -99,7 +99,7 @@ public class LeagueView extends SimpleInventory {
                 .defaultCallback(callback -> viewCache.getRankingView().openInventory(player))
         );
 
-        editor.setItem(15, InventoryItem.of(new ItemBuilder("ab527a18dec3d6dac532f5555b9119c31b7a8397b8a06d249d0eb39241c5485f")
+        editor.setItem(15, InventoryItem.of(new ItemBuilder("/texture/ab527a18dec3d6dac532f5555b9119c31b7a8397b8a06d249d0eb39241c5485f")
                 .name("&aHistórico de Eventos")
                 .setLore(
                         "&7Veja os eventos anteriores que",

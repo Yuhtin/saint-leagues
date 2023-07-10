@@ -39,10 +39,18 @@ public class LeagueClanCommand implements TerminableModule {
                     int points = Math.max(0, context.arg(2).parseOrFail(Integer.class));
                     int total = action.equalsIgnoreCase("remove") ? points * -1 : points;
 
-                    IntervalTime time = IntervalTime.valueOf(context.arg(3)
+                    String intervalName = context.arg(3)
                             .parse(String.class)
                             .orElse("mensal")
-                            .toUpperCase());
+                            .toUpperCase();
+
+                    IntervalTime time;
+                    try {
+                        time = IntervalTime.valueOf(intervalName);
+                    } catch (Exception exception) {
+                        context.reply("&cIntervalo de tempo inválido! &8(Mensal/Trimestral)");
+                        return;
+                    }
 
                     LeagueClanCache cache = LeagueClanCache.getInstance();
                     cache.addPoints(time, clanTag, total);
@@ -54,7 +62,7 @@ public class LeagueClanCommand implements TerminableModule {
         Commands.create()
                 .assertPlayer()
                 .assertPermission("league.admin")
-                .assertUsage("<posição> <mensal/trimestral>")
+                .assertUsage("<posição> [mensal/trimestral]")
                 .handler(context -> {
                     String action = context.arg(0).parseOrFail(String.class);
                     if (action.equalsIgnoreCase("reload")) {
@@ -64,16 +72,29 @@ public class LeagueClanCommand implements TerminableModule {
                         return;
                     }
 
+                    if (!context.arg(1).isPresent()) {
+                        context.reply("&cVocê deve especificar o intervalo de tempo! &8(Mensal/Trimestral)");
+                        return;
+                    }
+
                     int position = context.arg(0).parseOrFail(Integer.class);
                     if (position < 1 || position > 10) {
                         context.reply("&cPosição inválida! &8(Apenas de 1 à 10)");
                         return;
                     }
 
-                    IntervalTime time = IntervalTime.valueOf(context.arg(1)
+                    String intervalName = context.arg(1)
                             .parse(String.class)
                             .orElse("mensal")
-                            .toUpperCase());
+                            .toUpperCase();
+
+                    IntervalTime time;
+                    try {
+                        time = IntervalTime.valueOf(intervalName);
+                    } catch (Exception exception) {
+                        context.reply("&cIntervalo de tempo inválido! &8(Mensal/Trimestral)");
+                        return;
+                    }
 
                     Player player = context.sender();
 

@@ -16,18 +16,22 @@ discord-webhook-link: ""
 
 # Sistema para premiar mensalmente o top clan (1º 2º e 3º lugar)
 auto-reward:
-  day: 7
-  hour: 13
-
   # Placeholders: $clanTag $player
   # Os comandos vão ser executado para cada jogador do clan
-  rewards:
+  MENSAL:
     1:
-      - 'give $player diamond 15'
+      - 'money give $player 1'
     2:
-      - 'give $player diamond 5'
+      - 'money give $player 1'
     3:
-      - 'give $player diamond 1'
+      - 'money give $player 1'
+  TRIMESTRAL:
+    1:
+      - 'money give $player 1'
+    2:
+      - 'money give $player 1'
+    3:
+      - 'money give $player 1'
 
 reward-per-event:
   Vote:

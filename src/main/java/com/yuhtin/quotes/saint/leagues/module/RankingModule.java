@@ -1,6 +1,5 @@
 package com.yuhtin.quotes.saint.leagues.module;
 
-import com.google.common.collect.Lists;
 import com.yuhtin.quotes.saint.leagues.LeaguesPlugin;
 import com.yuhtin.quotes.saint.leagues.cache.LeagueClanCache;
 import com.yuhtin.quotes.saint.leagues.model.LeagueClan;
@@ -16,6 +15,7 @@ import me.lucko.helper.terminable.module.TerminableModule;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
@@ -28,16 +28,12 @@ import javax.annotation.Nonnull;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
-import java.util.UUID;
 
 /**
  * @author <a href="https://github.com/Yuhtin">Yuhtin</a>
  */
 @AllArgsConstructor
 public class RankingModule implements TerminableModule {
-
-    public static final List<UUID> STANDS = Lists.newLinkedList();
-    public static final List<String> HOLOGRAMS = Lists.newLinkedList();
 
     private static final Material[] HEADS = new Material[]{
             Material.DIAMOND_BLOCK, Material.GOLD_BLOCK,
@@ -94,7 +90,7 @@ public class RankingModule implements TerminableModule {
 
                 ConfigurationSection section = instance.getConfig().getConfigurationSection(path);
                 if (section == null) {
-                    instance.getLogger().warning("Ranking position section is null");
+                    instance.getLogger().warning("Ranking position section is null (" + path + ")");
                     return;
                 }
 
@@ -128,26 +124,23 @@ public class RankingModule implements TerminableModule {
     }
 
     public void clearStands() {
-        HOLOGRAMS.forEach(DHAPI::removeHologram);
-
         for (Hologram hologram : DecentHologramsAPI.get().getHologramManager().getHolograms()) {
             if (hologram.getName().startsWith("saintleagues")) {
                 DHAPI.removeHologram(hologram.getName());
             }
         }
 
-        STANDS.forEach(stand -> {
-            Entity entity = Bukkit.getEntity(stand);
-            if (entity == null) return;
-
-            entity.remove();
-        });
-
-        STANDS.clear();
+        for (World world : Bukkit.getWorlds()) {
+            for (Entity entity : world.getEntities()) {
+                if (entity.hasMetadata("saintleagues")) {
+                    entity.remove();
+                }
+            }
+        }
     }
 
     private void updateRanking(LeagueClan clan, Location location, int position) {
-        createHologram(location.clone().add(0, 2.15, 0), Arrays.asList(
+        createHologram(location.clone().add(0, 3, 0), Arrays.asList(
                 "&a" + position + "º Lugar",
                 "&e" + clan.getTag(),
                 "&e" + clan.getPoints() + " pontos"
@@ -161,13 +154,15 @@ public class RankingModule implements TerminableModule {
 
         stand.setVisible(false);
         stand.setMetadata("saintleagues", new FixedMetadataValue(instance, true));
-        stand.setSmall(true);
         stand.setCustomNameVisible(false);
         stand.setGravity(false);
         stand.setArms(true);
 
         EntityEquipment equipment = stand.getEquipment();
-        if (equipment == null) return;
+        if (equipment == null) {
+            stand.setVisible(true);
+            return;
+        }
 
         Material head = HEADS[Math.min(HEADS.length, position) - 1];
         equipment.setHelmet(new ItemStack(head));
@@ -182,11 +177,9 @@ public class RankingModule implements TerminableModule {
         equipment.setBoots(new ItemStack(boots));
 
         stand.setVisible(true);
-
-        STANDS.add(stand.getUniqueId());
     }
 
     public void createHologram(Location location, List<String> lines) {
-        HOLOGRAMS.add(DHAPI.createHologram("saintleagues-" + new Random().nextInt(1000), location, false, lines).getName());
+        DHAPI.createHologram("saintleagues-" + new Random().nextInt(1000), location, false, lines);
     }
 }

@@ -7,6 +7,7 @@ import com.yuhtin.quotes.saint.leagues.util.DiscordWebhook;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 
+import java.awt.*;
 import java.io.IOException;
 
 /**
@@ -41,12 +42,13 @@ public class DiscordAlertSender {
         embedObject.setTitle("SAINT LIGA - " + tag + " <:pepeespada:939611804059963493>");
         embedObject.setDescription("O clã " + tag + " ganhou " + points + " pontos por " + motive.toLowerCase() + ".");
         embedObject.setFooter("Que a vitória seja dos mais fortes! Rede Saint", "");
+        embedObject.setColor(Color.RED);
 
         embedObject.addField("CLAN", tag, true);
         embedObject.addField("PONTOS", String.valueOf(points), true);
         embedObject.addField("RAZÃO", motive, true);
-        embedObject.addField("PONTUAÇÃO MENSAL", mensalPoints + " - #" + mensalRanking, true);
-        embedObject.addField("PONTUAÇÃO TRIMESTRAL", trimestralPoints + " - #" + trimestralRanking, true);
+        embedObject.addField("PONTUAÇÃO MENSAL", mensalPoints + " pontos - #" + mensalRanking, true);
+        embedObject.addField("PONTUAÇÃO TRIMESTRAL", trimestralPoints + " pontos - #" + trimestralRanking, true);
 
         discordWebhook.addEmbed(embedObject);
 

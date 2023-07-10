@@ -87,7 +87,7 @@ public class HistoricView extends PagedInventory {
             items.add(() -> {
 
                 List<String> playersInvolved = event.getPlayersInvolved();
-                return InventoryItem.of(new ItemBuilder(event.getLeagueEventType().getMaterial())
+                return InventoryItem.of(new ItemBuilder(event.getLeagueEventType().getItemStack())
                         .name("&a" + event.getName() + " &8(#" + event.getId() + ")")
                         .setLore(
                                 "&fData: &e" + event.getFormattedDate(),

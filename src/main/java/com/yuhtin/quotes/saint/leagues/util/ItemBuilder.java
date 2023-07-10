@@ -36,9 +36,17 @@ public class ItemBuilder {
     }
 
     public ItemBuilder(String link) {
-        if (!link.contains("http")) {
-            link = "http://textures.minecraft.net/texture/" + link;
+        item = new ItemStack(Material.PLAYER_HEAD);
+
+        if (!link.startsWith("/texture/")) {
+            SkullMeta meta = (SkullMeta) item.getItemMeta();
+            meta.setOwner(link);
+
+            item.setItemMeta(meta);
+            return;
         }
+
+        link = "http://textures.minecraft.net" + link;
 
         GameProfile profile = new GameProfile(UUID.randomUUID(), null);
         PropertyMap propertyMap = profile.getProperties();
@@ -49,7 +57,6 @@ public class ItemBuilder {
         byte[] encodedData = new Base64().encode(String.format("{textures:{SKIN:{url:\"%s\"}}}", link).getBytes());
         propertyMap.put("textures", new Property("textures", new String(encodedData)));
 
-        item = new ItemStack(Material.PLAYER_HEAD);
 
         ItemMeta headMeta = item.getItemMeta();
         Class<?> headMetaClass = headMeta.getClass();
@@ -83,7 +90,7 @@ public class ItemBuilder {
     }
 
     public ItemBuilder setLore(List<String> lore) {
-        return changeItemMeta(it -> it.setLore(lore));
+        return changeItemMeta(it -> it.setLore(ColorUtil.colored(lore)));
     }
 
     public ItemStack wrap() {
