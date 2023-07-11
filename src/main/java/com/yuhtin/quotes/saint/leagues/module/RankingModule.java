@@ -25,6 +25,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
 
 import javax.annotation.Nonnull;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
@@ -34,6 +35,8 @@ import java.util.Random;
  */
 @AllArgsConstructor
 public class RankingModule implements TerminableModule {
+
+     private static final List<String> HOLOGRAMS = new ArrayList<>();
 
     private static final Material[] HEADS = new Material[]{
             Material.DIAMOND_BLOCK, Material.GOLD_BLOCK,
@@ -124,19 +127,22 @@ public class RankingModule implements TerminableModule {
     }
 
     public void clearStands() {
+        Bukkit.getWorlds().stream()
+                .flatMap(world -> world.getEntities().stream())
+                .filter(entity -> entity instanceof ArmorStand)
+                .filter(entity -> entity.getCustomName() != null)
+                .filter(entity -> entity.getCustomName().equalsIgnoreCase("saintleagues"))
+                .forEach(Entity::remove);
+
+        HOLOGRAMS.forEach(DHAPI::removeHologram);
+
         for (Hologram hologram : DecentHologramsAPI.get().getHologramManager().getHolograms()) {
             if (hologram.getName().startsWith("saintleagues")) {
                 DHAPI.removeHologram(hologram.getName());
             }
         }
 
-        for (World world : Bukkit.getWorlds()) {
-            for (Entity entity : world.getEntities()) {
-                if (entity.hasMetadata("saintleagues")) {
-                    entity.remove();
-                }
-            }
-        }
+        HOLOGRAMS.clear();
     }
 
     private void updateRanking(LeagueClan clan, Location location, int position) {
@@ -155,6 +161,7 @@ public class RankingModule implements TerminableModule {
         stand.setVisible(false);
         stand.setMetadata("saintleagues", new FixedMetadataValue(instance, true));
         stand.setCustomNameVisible(false);
+        stand.setCustomName("saintleagues");
         stand.setGravity(false);
         stand.setArms(true);
 
@@ -180,6 +187,9 @@ public class RankingModule implements TerminableModule {
     }
 
     public void createHologram(Location location, List<String> lines) {
-        DHAPI.createHologram("saintleagues-" + new Random().nextInt(1000), location, false, lines);
+        String name = "saintleagues-" + new Random().nextInt(10000);
+
+        if (DHAPI.getHologram(name) != null) createHologram(location, lines);
+        HOLOGRAMS.add(DHAPI.createHologram(name, location, false, lines).getName());
     }
 }
