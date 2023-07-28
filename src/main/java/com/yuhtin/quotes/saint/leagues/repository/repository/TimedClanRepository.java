@@ -60,7 +60,7 @@ public class TimedClanRepository {
 
     public void createTable() {
         sqlExecutor.updateQuery("CREATE TABLE IF NOT EXISTS " + getTable() + "(" +
-                "clanTag CHAR(3) NOT NULL PRIMARY KEY," +
+                "clanTag CHAR(4) NOT NULL PRIMARY KEY," +
                 "points INT NOT NULL" +
                 ");"
         );
