@@ -67,6 +67,8 @@ public class TimedClanRepository {
     }
 
     public void recreateTable() {
+        cache.clear();
+
         sqlExecutor.updateQuery("DROP TABLE IF EXISTS " + getTable());
         createTable();
     }
