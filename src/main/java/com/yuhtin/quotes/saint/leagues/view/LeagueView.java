@@ -5,7 +5,7 @@ import com.henryfabio.minecraft.inventoryapi.inventory.impl.simple.SimpleInvento
 import com.henryfabio.minecraft.inventoryapi.item.InventoryItem;
 import com.henryfabio.minecraft.inventoryapi.viewer.Viewer;
 import com.yuhtin.quotes.saint.leagues.LeaguesPlugin;
-import com.yuhtin.quotes.saint.leagues.cache.LeagueClanCache;
+import com.yuhtin.quotes.saint.leagues.repository.RepositoryManager;
 import com.yuhtin.quotes.saint.leagues.cache.ViewCache;
 import com.yuhtin.quotes.saint.leagues.model.IntervalTime;
 import com.yuhtin.quotes.saint.leagues.model.LeagueEvent;
@@ -31,13 +31,13 @@ public class LeagueView extends SimpleInventory {
     @Override
     protected void configureInventory(Viewer viewer, InventoryEditor editor) {
         LeaguesPlugin instance = LeaguesPlugin.getInstance();
-        LeagueClanCache cache = LeagueClanCache.getInstance();
+        RepositoryManager manager = RepositoryManager.getInstance();
 
         Player player = viewer.getPlayer();
         String clanTag = instance.getSimpleClansAccessor().getClanTag(player);
 
         int playerPoints = instance.getEventRepository()
-                .groupByPlayer(player.getName(), cache.getRepository(IntervalTime.MENSAL))
+                .groupByPlayer(player.getName(), manager.getRepository(IntervalTime.MENSAL))
                 .stream()
                 .map(LeagueEvent::getPoints)
                 .reduce(0, Integer::sum);
@@ -52,7 +52,7 @@ public class LeagueView extends SimpleInventory {
             lore.add("");
 
             for (IntervalTime time : IntervalTime.values()) {
-                TimedClanRepository repository = cache.getRepository(time);
+                TimedClanRepository repository = manager.getRepository(time);
 
                 int points = repository.getPointsByTag(clanTag);
                 int position = repository.getPositionByClan(clanTag);

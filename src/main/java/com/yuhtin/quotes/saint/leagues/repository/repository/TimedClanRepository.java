@@ -9,7 +9,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
@@ -26,7 +25,6 @@ public class TimedClanRepository {
     @Setter
     private long initialTime;
 
-    private final HashMap<String, Integer> cache = new HashMap<>();
     private final List<String> ranking = new ArrayList<>();
 
     public LeagueClan getByPosition(int position) {
@@ -38,7 +36,6 @@ public class TimedClanRepository {
 
     public int getPointsByTag(String tag) {
         if (tag == null) return -1;
-        if (cache.containsKey(tag)) return cache.get(tag);
 
         LeagueClan clan = this.findByTag(tag);
         if (clan == null) {
@@ -46,7 +43,6 @@ public class TimedClanRepository {
             this.insert(tag, 0);
         }
 
-        cache.put(tag, clan.getPoints());
         return clan.getPoints();
     }
 
@@ -67,8 +63,6 @@ public class TimedClanRepository {
     }
 
     public void recreateTable() {
-        cache.clear();
-
         sqlExecutor.updateQuery("DROP TABLE IF EXISTS " + getTable());
         createTable();
     }

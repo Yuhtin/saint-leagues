@@ -1,7 +1,7 @@
 package com.yuhtin.quotes.saint.leagues.hook.impl;
 
 import com.yuhtin.quotes.saint.leagues.LeaguesPlugin;
-import com.yuhtin.quotes.saint.leagues.cache.LeagueClanCache;
+import com.yuhtin.quotes.saint.leagues.repository.RepositoryManager;
 import com.yuhtin.quotes.saint.leagues.hook.LeagueEventHook;
 import com.yuhtin.quotes.saint.leagues.model.LeagueEvent;
 import com.yuhtin.quotes.saint.leagues.model.LeagueEventType;
@@ -64,7 +64,7 @@ public class DragonSlayerHook extends LeagueEventHook {
                             .build();
 
                     instance.getEventRepository().insert(leagueEvent);
-                    LeagueClanCache.getInstance().addPoints(clanTag, points, "vencer o evento " + eventName);
+                    RepositoryManager.getInstance().addPoints(clanTag, points, "vencer o evento " + eventName);
 
                     instance.getLogger().info("[DragonSlayer] Vitória de " + player.getName() + " [" + clanTag + "] (+ " + points + " pontos)");
                 }).registerAndBind(consumer, "dragonslayerkill");

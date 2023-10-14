@@ -1,7 +1,7 @@
 package com.yuhtin.quotes.saint.leagues.hook.impl;
 
 import com.yuhtin.quotes.saint.leagues.LeaguesPlugin;
-import com.yuhtin.quotes.saint.leagues.cache.LeagueClanCache;
+import com.yuhtin.quotes.saint.leagues.repository.RepositoryManager;
 import com.yuhtin.quotes.saint.leagues.hook.LeagueEventHook;
 import com.yuhtin.quotes.saint.leagues.model.LeagueEvent;
 import com.yuhtin.quotes.saint.leagues.model.LeagueEventType;
@@ -67,7 +67,7 @@ public class TitansBattleHook extends LeagueEventHook {
                             .build();
 
                     instance.getEventRepository().insert(leagueEvent);
-                    LeagueClanCache.getInstance().addPoints(clanTag, points, "vencer o evento " + name);
+                    RepositoryManager.getInstance().addPoints(clanTag, points, "vencer o evento " + name);
 
                     instance.getLogger().info("[TitansBattle] Vitória de " + clanTag + " (+ " + points + " pontos)");
                 }).bindWith(consumer);

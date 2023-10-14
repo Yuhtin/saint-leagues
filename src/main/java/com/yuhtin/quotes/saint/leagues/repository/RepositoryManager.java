@@ -1,4 +1,4 @@
-package com.yuhtin.quotes.saint.leagues.cache;
+package com.yuhtin.quotes.saint.leagues.repository;
 
 import com.yuhtin.quotes.saint.leagues.model.IntervalTime;
 import com.yuhtin.quotes.saint.leagues.model.LeagueClan;
@@ -15,14 +15,14 @@ import java.util.Set;
 /**
  * @author <a href="https://github.com/Yuhtin">Yuhtin</a>
  */
-public class LeagueClanCache {
+@Getter
+public class RepositoryManager {
 
-    public static final LeagueClanCache INSTANCE = new LeagueClanCache();
+    public static final RepositoryManager INSTANCE = new RepositoryManager();
 
-    @Getter
     private final HashMap<IntervalTime, TimedClanRepository> repositories = new HashMap<>();
 
-    public static LeagueClanCache getInstance() {
+    public static RepositoryManager getInstance() {
         return INSTANCE;
     }
 
@@ -51,7 +51,6 @@ public class LeagueClanCache {
         TimedClanRepository repository = getRepository(interval);
         int currentPoints = repository.getPointsByTag(tag) + points;
 
-        repository.getCache().put(tag, currentPoints);
         repository.insert(tag, currentPoints);
     }
 
@@ -59,7 +58,6 @@ public class LeagueClanCache {
         for (TimedClanRepository repository : repositories.values()) {
             int currentPoints = repository.getPointsByTag(tag) + points;
 
-            repository.getCache().put(tag, currentPoints);
             repository.insert(tag, currentPoints);
         }
 

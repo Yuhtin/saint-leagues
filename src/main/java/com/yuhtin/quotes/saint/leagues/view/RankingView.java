@@ -9,7 +9,7 @@ import com.henryfabio.minecraft.inventoryapi.viewer.Viewer;
 import com.henryfabio.minecraft.inventoryapi.viewer.configuration.border.Border;
 import com.henryfabio.minecraft.inventoryapi.viewer.impl.paged.PagedViewer;
 import com.yuhtin.quotes.saint.leagues.LeaguesPlugin;
-import com.yuhtin.quotes.saint.leagues.cache.LeagueClanCache;
+import com.yuhtin.quotes.saint.leagues.repository.RepositoryManager;
 import com.yuhtin.quotes.saint.leagues.model.IntervalTime;
 import com.yuhtin.quotes.saint.leagues.util.BannerAlphabetic;
 import com.yuhtin.quotes.saint.leagues.util.ItemBuilder;
@@ -63,13 +63,13 @@ public class RankingView extends PagedInventory {
 
     @Override
     protected List<InventoryItemSupplier> createPageItems(@NotNull PagedViewer viewer) {
-        LeagueClanCache cache = LeagueClanCache.getInstance();
+        RepositoryManager manager = RepositoryManager.getInstance();
         List<InventoryItemSupplier> items = new ArrayList<>();
 
         Integer integer = sorterType.getOrDefault(viewer.getPlayer().getName(), 0);
         IntervalTime intervalTime = IntervalTime.values()[integer];
 
-        for (String clanTag : cache.getRanking(intervalTime)) {
+        for (String clanTag : manager.getRanking(intervalTime)) {
             items.add(() -> {
                 int clanAppearences = LeaguesPlugin.getInstance()
                         .getEventRepository()
@@ -82,8 +82,8 @@ public class RankingView extends PagedInventory {
 
                 ItemStack itemStack = bannerAlphabetic.getBanner();
 
-                int position = cache.getPositionByClan(intervalTime, clanTag);
-                int points = cache.getPointsByTag(intervalTime, clanTag);
+                int position = manager.getPositionByClan(intervalTime, clanTag);
+                int points = manager.getPointsByTag(intervalTime, clanTag);
 
                 return InventoryItem.of(new ItemBuilder(itemStack)
                         .name("&a" + clanTag + " &6(#" + position + ")")

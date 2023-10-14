@@ -1,8 +1,7 @@
 package com.yuhtin.quotes.saint.leagues.module;
 
 import com.yuhtin.quotes.saint.leagues.LeaguesPlugin;
-import com.yuhtin.quotes.saint.leagues.cache.LeagueClanCache;
-import com.yuhtin.quotes.saint.leagues.model.IntervalTime;
+import com.yuhtin.quotes.saint.leagues.repository.RepositoryManager;
 import com.yuhtin.quotes.saint.leagues.model.LeagueClan;
 import com.yuhtin.quotes.saint.leagues.repository.repository.TimedClanRepository;
 import lombok.AllArgsConstructor;
@@ -12,7 +11,6 @@ import me.lucko.helper.terminable.module.TerminableModule;
 import org.bukkit.Bukkit;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Calendar;
 import java.util.List;
 import java.util.Set;
 
@@ -27,7 +25,7 @@ public class AutoRewardModule implements TerminableModule {
     @Override
     public void setup(@NotNull TerminableConsumer consumer) {
         Schedulers.sync().runRepeating(runnable -> {
-            for (TimedClanRepository repository : LeagueClanCache.getInstance().getRepositories().values()) {
+            for (TimedClanRepository repository : RepositoryManager.getInstance().getRepositories().values()) {
                 if (repository.getInitialTime() == -1 || repository.getFinalTime() > System.currentTimeMillis()) continue;
                 if (!runReward(repository)) continue;
 

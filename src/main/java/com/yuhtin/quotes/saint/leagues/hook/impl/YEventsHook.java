@@ -3,7 +3,7 @@ package com.yuhtin.quotes.saint.leagues.hook.impl;
 import com.ystoreplugins.yeventos.event.EventType;
 import com.ystoreplugins.yeventos.event.PlayerWinEventEvent;
 import com.yuhtin.quotes.saint.leagues.LeaguesPlugin;
-import com.yuhtin.quotes.saint.leagues.cache.LeagueClanCache;
+import com.yuhtin.quotes.saint.leagues.repository.RepositoryManager;
 import com.yuhtin.quotes.saint.leagues.hook.LeagueEventHook;
 import com.yuhtin.quotes.saint.leagues.model.LeagueEvent;
 import com.yuhtin.quotes.saint.leagues.model.LeagueEventType;
@@ -66,7 +66,7 @@ public class YEventsHook extends LeagueEventHook {
                             .build();
 
                     instance.getEventRepository().insert(leagueEvent);
-                    LeagueClanCache.getInstance().addPoints(clanTag, points, "vencer o evento " + eventName);
+                    RepositoryManager.getInstance().addPoints(clanTag, points, "vencer o evento " + eventName);
 
                     instance.getLogger().info("[yEventos] [" + eventName + "] Vitória de " + player.getName() + " [" + clanTag + "] (+ " + points + " pontos)");
                 }).bindWith(consumer);

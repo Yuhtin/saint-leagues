@@ -10,7 +10,7 @@ import com.henryfabio.minecraft.inventoryapi.viewer.configuration.border.Border;
 import com.henryfabio.minecraft.inventoryapi.viewer.impl.paged.PagedViewer;
 import com.henryfabio.minecraft.inventoryapi.viewer.property.ViewerPropertyMap;
 import com.yuhtin.quotes.saint.leagues.LeaguesPlugin;
-import com.yuhtin.quotes.saint.leagues.cache.LeagueClanCache;
+import com.yuhtin.quotes.saint.leagues.repository.RepositoryManager;
 import com.yuhtin.quotes.saint.leagues.model.IntervalTime;
 import com.yuhtin.quotes.saint.leagues.model.LeagueEvent;
 import com.yuhtin.quotes.saint.leagues.model.LeagueEventType;
@@ -70,7 +70,7 @@ public class HistoricView extends PagedInventory {
 
         int periodFilter = periodSorterType.getOrDefault(viewer.getName(), 0);
         IntervalTime intervalTime = IntervalTime.values()[periodFilter];
-        TimedClanRepository timedRepository = LeagueClanCache.getInstance().getRepository(intervalTime);
+        TimedClanRepository timedRepository = RepositoryManager.getInstance().getRepository(intervalTime);
 
         EventRepository eventRepository = LeaguesPlugin.getInstance().getEventRepository();
         Set<LeagueEvent> events = playerName != null

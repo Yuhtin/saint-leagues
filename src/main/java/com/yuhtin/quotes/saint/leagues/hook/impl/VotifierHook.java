@@ -3,13 +3,12 @@ package com.yuhtin.quotes.saint.leagues.hook.impl;
 import com.vexsoftware.votifier.model.Vote;
 import com.vexsoftware.votifier.model.VotifierEvent;
 import com.yuhtin.quotes.saint.leagues.LeaguesPlugin;
-import com.yuhtin.quotes.saint.leagues.cache.LeagueClanCache;
+import com.yuhtin.quotes.saint.leagues.repository.RepositoryManager;
 import com.yuhtin.quotes.saint.leagues.hook.LeagueEventHook;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import me.lucko.helper.Events;
 import me.lucko.helper.terminable.TerminableConsumer;
-import me.lucko.helper.terminable.module.TerminableModule;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -44,7 +43,7 @@ public class VotifierHook extends LeagueEventHook {
                     String name = instance.getConfig().getString(path + ".name");
                     int points = instance.getConfig().getInt(path + ".points");
 
-                    LeagueClanCache.getInstance().addPoints(clanTag, points, name);
+                    RepositoryManager.getInstance().addPoints(clanTag, points, name);
                 }).bindWith(consumer);
 
     }

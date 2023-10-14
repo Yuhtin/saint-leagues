@@ -1,7 +1,7 @@
 package com.yuhtin.quotes.saint.leagues.module;
 
 import com.yuhtin.quotes.saint.leagues.LeaguesPlugin;
-import com.yuhtin.quotes.saint.leagues.cache.LeagueClanCache;
+import com.yuhtin.quotes.saint.leagues.repository.RepositoryManager;
 import com.yuhtin.quotes.saint.leagues.model.LeagueClan;
 import com.yuhtin.quotes.saint.leagues.repository.repository.TimedClanRepository;
 import eu.decentsoftware.holograms.api.DHAPI;
@@ -15,7 +15,6 @@ import me.lucko.helper.terminable.module.TerminableModule;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
@@ -64,7 +63,7 @@ public class RankingModule implements TerminableModule {
 
 
     private final LeaguesPlugin instance;
-    private final LeagueClanCache cache;
+    private final RepositoryManager manager;
 
     @Override
     public void setup(@Nonnull TerminableConsumer consumer) {
@@ -80,7 +79,7 @@ public class RankingModule implements TerminableModule {
         long start = System.currentTimeMillis();
         instance.getLogger().info("Atualizando ranking...");
 
-        cache.refresh().thenRunSync(() -> {
+        manager.refresh().thenRunSync(() -> {
             long rankingUpdates = System.currentTimeMillis();
 
             instance.getLogger().info("Ranking atualizado em " + (rankingUpdates - start) + "ms");
@@ -88,7 +87,7 @@ public class RankingModule implements TerminableModule {
 
             clearStands();
 
-            for (TimedClanRepository repository : cache.getRepositories().values()) {
+            for (TimedClanRepository repository : manager.getRepositories().values()) {
                 String path = "ranking.position." + repository.getIntervalTime().name();
 
                 ConfigurationSection section = instance.getConfig().getConfigurationSection(path);

@@ -1,11 +1,10 @@
 package com.yuhtin.quotes.saint.leagues.module;
 
 import com.yuhtin.quotes.saint.leagues.LeaguesPlugin;
-import com.yuhtin.quotes.saint.leagues.cache.LeagueClanCache;
+import com.yuhtin.quotes.saint.leagues.repository.RepositoryManager;
 import com.yuhtin.quotes.saint.leagues.model.IntervalTime;
 import com.yuhtin.quotes.saint.leagues.util.DiscordWebhook;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 
 import java.awt.*;
 import java.io.IOException;
@@ -28,18 +27,18 @@ public class DiscordAlertSender {
             return;
         }
 
-        LeagueClanCache cache = LeagueClanCache.getInstance();
+        RepositoryManager manager = RepositoryManager.getInstance();
 
-        int mensalRanking = cache.getPositionByClan(IntervalTime.MENSAL, tag);
-        int trimestralRanking = cache.getPositionByClan(IntervalTime.TRIMESTRAL, tag);
+        int mensalRanking = manager.getPositionByClan(IntervalTime.MENSAL, tag);
+        int trimestralRanking = manager.getPositionByClan(IntervalTime.TRIMESTRAL, tag);
 
-        int mensalPoints = cache.getPointsByTag(IntervalTime.MENSAL, tag);
-        int trimestralPoints = cache.getPointsByTag(IntervalTime.TRIMESTRAL, tag);
+        int mensalPoints = manager.getPointsByTag(IntervalTime.MENSAL, tag);
+        int trimestralPoints = manager.getPointsByTag(IntervalTime.TRIMESTRAL, tag);
 
         DiscordWebhook discordWebhook = new DiscordWebhook(link);
         DiscordWebhook.EmbedObject embedObject = new DiscordWebhook.EmbedObject();
 
-        embedObject.setTitle("SAINT LIGA - " + tag + " <:pepeespada:939611804059963493>");
+        embedObject.setTitle("SAINT LIGA - " + tag + " <a:1Espada:1149729957434634403>");
         embedObject.setDescription("O clã " + tag + " ganhou " + points + " pontos por " + motive.toLowerCase() + ".");
         embedObject.setFooter("Que a vitória seja dos mais fortes! Rede Saint", "");
         embedObject.setColor(Color.RED);

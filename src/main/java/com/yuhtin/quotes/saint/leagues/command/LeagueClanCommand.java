@@ -1,7 +1,7 @@
 package com.yuhtin.quotes.saint.leagues.command;
 
 import com.yuhtin.quotes.saint.leagues.LeaguesPlugin;
-import com.yuhtin.quotes.saint.leagues.cache.LeagueClanCache;
+import com.yuhtin.quotes.saint.leagues.repository.RepositoryManager;
 import com.yuhtin.quotes.saint.leagues.model.IntervalTime;
 import lombok.AllArgsConstructor;
 import me.lucko.helper.Commands;
@@ -52,10 +52,10 @@ public class LeagueClanCommand implements TerminableModule {
                         return;
                     }
 
-                    LeagueClanCache cache = LeagueClanCache.getInstance();
-                    cache.addPoints(time, clanTag, total);
+                    RepositoryManager manager = RepositoryManager.getInstance();
+                    manager.addPoints(time, clanTag, total);
 
-                    int current = cache.getPointsByTag(time, clanTag);
+                    int current = manager.getPointsByTag(time, clanTag);
                     context.reply("&aClan &f" + clanTag + " &aagora possui &f" + current + " &apontos!");
                 }).registerAndBind(consumer, "ligaadm");
 
