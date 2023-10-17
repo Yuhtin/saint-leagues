@@ -31,10 +31,12 @@ public class LeagueClanCommand implements TerminableModule {
 
         Commands.create()
                 .assertPermission("league.admin")
-                .assertUsage("<add/remove> <clan> <pontos> [mensal/trimestral]")
+                .assertUsage("<add/remove> <player> <pontos> [mensal/trimestral]")
                 .handler(context -> {
                     String action = context.arg(0).parseOrFail(String.class);
-                    String clanTag = context.arg(1).parseOrFail(String.class).toUpperCase();
+                    String playerName = context.arg(1).parseOrFail(String.class);
+                    String clanTag = instance.getSimpleClansAccessor().getClanTag(playerName);
+                    if (clanTag == null) return;
 
                     int points = Math.max(0, context.arg(2).parseOrFail(Integer.class));
                     int total = action.equalsIgnoreCase("remove") ? points * -1 : points;

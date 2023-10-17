@@ -3,6 +3,7 @@ package com.yuhtin.quotes.saint.leagues;
 import com.henryfabio.minecraft.inventoryapi.manager.InventoryManager;
 import com.henryfabio.sqlprovider.connector.SQLConnector;
 import com.henryfabio.sqlprovider.executor.SQLExecutor;
+import com.yuhtin.quotes.saint.leagues.placeholder.ClansPlaceholder;
 import com.yuhtin.quotes.saint.leagues.repository.RepositoryManager;
 import com.yuhtin.quotes.saint.leagues.cache.ViewCache;
 import com.yuhtin.quotes.saint.leagues.command.LeagueClanCommand;
@@ -49,6 +50,8 @@ public class LeaguesPlugin extends ExtendedJavaPlugin {
 
         this.rankingModule = new RankingModule(this, RepositoryManager.getInstance());
         bindModule(rankingModule);
+
+        new ClansPlaceholder(this, RepositoryManager.getInstance()).register();
 
         getLogger().info("Plugin enabled!");
     }
