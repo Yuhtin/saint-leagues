@@ -5,6 +5,7 @@ import com.yuhtin.quotes.saint.leagues.repository.RepositoryManager;
 import com.yuhtin.quotes.saint.leagues.model.IntervalTime;
 import lombok.AllArgsConstructor;
 import me.lucko.helper.Commands;
+import me.lucko.helper.command.argument.Argument;
 import me.lucko.helper.terminable.TerminableConsumer;
 import me.lucko.helper.terminable.module.TerminableModule;
 import org.bukkit.Location;
@@ -31,7 +32,7 @@ public class LeagueClanCommand implements TerminableModule {
 
         Commands.create()
                 .assertPermission("league.admin")
-                .assertUsage("<add/remove> <player> <pontos> [mensal/trimestral]")
+                .assertUsage("<add/remove> <player> <pontos> <mensal/trimestral> <motivo>")
                 .handler(context -> {
                     String action = context.arg(0).parseOrFail(String.class);
                     String playerName = context.arg(1).parseOrFail(String.class);
@@ -41,21 +42,23 @@ public class LeagueClanCommand implements TerminableModule {
                     int points = Math.max(0, context.arg(2).parseOrFail(Integer.class));
                     int total = action.equalsIgnoreCase("remove") ? points * -1 : points;
 
-                    String intervalName = context.arg(3)
-                            .parse(String.class)
-                            .orElse("mensal")
-                            .toUpperCase();
-
                     IntervalTime time;
                     try {
-                        time = IntervalTime.valueOf(intervalName);
+                        time = IntervalTime.valueOf(context.arg(3).parseOrFail(String.class));
                     } catch (Exception exception) {
                         context.reply("&cIntervalo de tempo inválido! &8(Mensal/Trimestral)");
                         return;
                     }
 
+                    StringBuilder builder = new StringBuilder();
+                    for (String arg : context.args().subList(4, context.args().size())) {
+                        builder.append(arg).append(" ");
+                    }
+
+                    String motive = builder.toString().trim();
+
                     RepositoryManager manager = RepositoryManager.getInstance();
-                    manager.addPoints(time, clanTag, total);
+                    manager.addPoints(time, clanTag, total, motive);
 
                     int current = manager.getPointsByTag(time, clanTag);
                     context.reply("&aClan &f" + clanTag + " &aagora possui &f" + current + " &apontos!");

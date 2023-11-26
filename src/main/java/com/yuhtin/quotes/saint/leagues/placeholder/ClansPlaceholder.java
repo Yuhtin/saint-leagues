@@ -32,14 +32,20 @@ public class ClansPlaceholder extends PlaceholderExpansion {
 
     @Override
     public String onRequest(OfflinePlayer player, @NotNull String params) {
+        String[] split = params.split("-");
+        if (params.startsWith("clan")) {
+            String playerName = split[1];
+            String clanTag = instance.getSimpleClansAccessor().getClanTag(playerName);
+
+            return clanTag == null ? "..." : clanTag;
+        }
+
         if (params.startsWith("points")) {
-            IntervalTime interval = IntervalTime.valueOf(params.split("-")[1].toUpperCase());
+            IntervalTime interval = IntervalTime.valueOf(split[1].toUpperCase());
             String clanTag = instance.getSimpleClansAccessor().getClanTag(player.getName());
 
             return String.valueOf(manager.getPointsByTag(interval, clanTag));
         }
-
-        String[] split = params.split("-");
 
         IntervalTime interval = IntervalTime.valueOf(split[0].toUpperCase());
         String type = split[1];

@@ -47,11 +47,13 @@ public class RepositoryManager {
         return getRepository(interval).getPointsByTag(tag);
     }
 
-    public void addPoints(IntervalTime interval, String tag, int points) {
+    public void addPoints(IntervalTime interval, String tag, int points, String motive) {
         TimedClanRepository repository = getRepository(interval);
         int currentPoints = repository.getPointsByTag(tag) + points;
 
         repository.insert(tag, currentPoints);
+
+        DiscordAlertSender.of(tag, points, motive).send();
     }
 
     public void addPoints(String tag, int points, String motive) {
