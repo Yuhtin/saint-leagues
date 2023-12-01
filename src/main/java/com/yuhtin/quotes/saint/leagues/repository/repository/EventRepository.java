@@ -27,7 +27,7 @@ public final class EventRepository {
         sqlExecutor.updateQuery("CREATE TABLE IF NOT EXISTS " + TABLE + "(" +
                 "id CHAR(8) NOT NULL PRIMARY KEY," +
                 "name CHAR(36) NOT NULL," +
-                "winner_clan CHAR(4) NOT NULL," +
+                "winner_clan CHAR(10) NOT NULL," +
                 "event_type CHAR(36) NOT NULL," +
                 "points INT NOT NULL," +
                 "timestamp BIGINT NOT NULL," +

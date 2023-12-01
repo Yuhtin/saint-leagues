@@ -212,7 +212,7 @@ public final class Reflections {
                 field.setAccessible(true);
 
                 // A function for retrieving a specific field value
-                return new FieldAccessor<T>() {
+                return new FieldAccessor<>() {
                     @SuppressWarnings("unchecked")
                     @Override
                     public T get(Object target) {
