@@ -19,6 +19,8 @@ import lombok.Getter;
 import me.lucko.helper.plugin.ExtendedJavaPlugin;
 import org.bukkit.Bukkit;
 
+import java.util.Calendar;
+
 /**
  * @author <a href="https://github.com/Yuhtin">Yuhtin</a>
  */
@@ -75,18 +77,23 @@ public class LeaguesPlugin extends ExtendedJavaPlugin {
 
     private void initCache(SQLExecutor sqlExecutor) {
         for (IntervalTime time : IntervalTime.values()) {
-            long initialTime = getConfig().getLong("initial-time." + time.name().toUpperCase(), -1);
-            if (initialTime == -1) {
+            long initialTime = getConfig().getLong("initial-time." + time.name().toUpperCase(), -1L);
+            if (initialTime == -1L) {
+                getConfig().set("initial-time." + time.name().toUpperCase(), System.currentTimeMillis());
+                saveConfig();
                 initialTime = System.currentTimeMillis();
-
-                getConfig().set("initial-time." + time.name().toUpperCase(), initialTime);
+            }
+            long resetTime = getConfig().getLong("reset-time." + time.name().toUpperCase(), -1L);
+            if (resetTime == -1L) {
+                Calendar calendar = Calendar.getInstance();
+                calendar.setTimeInMillis(initialTime);
+                calendar.add(2, time.getMonths());
+                getConfig().set("reset-time." + time.name().toUpperCase(), calendar.getTimeInMillis());
                 saveConfig();
             }
-
             TimedClanRepository repository = new TimedClanRepository(sqlExecutor, time);
             repository.createTable();
             repository.setInitialTime(initialTime);
-
             RepositoryManager.getInstance().register(time, repository);
         }
     }

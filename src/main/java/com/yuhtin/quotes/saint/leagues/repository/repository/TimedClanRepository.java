@@ -1,6 +1,7 @@
 package com.yuhtin.quotes.saint.leagues.repository.repository;
 
 import com.henryfabio.sqlprovider.executor.SQLExecutor;
+import com.yuhtin.quotes.saint.leagues.LeaguesPlugin;
 import com.yuhtin.quotes.saint.leagues.model.IntervalTime;
 import com.yuhtin.quotes.saint.leagues.model.LeagueClan;
 import com.yuhtin.quotes.saint.leagues.repository.adapters.LeagueClanAdapter;
@@ -99,7 +100,7 @@ public class TimedClanRepository {
     }
 
     public long getFinalTime() {
-        return initialTime + intervalTime.getMillis();
+        return LeaguesPlugin.getInstance().getConfig().getLong("reset-time." + this.intervalTime.name());
     }
 
     public String getTable() {

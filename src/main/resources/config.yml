@@ -12,6 +12,10 @@ initial-time:
   MENSAL: -1
   TRIMESTRAL: -1
 
+reset-time:
+  MENSAL: -1
+  TRIMESTRAL: -1
+
 discord-webhook-link: ""
 
 # Sistema para premiar mensalmente o top clan (1º 2º e 3º lugar)
