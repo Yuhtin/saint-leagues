@@ -4,9 +4,11 @@ import com.henryfabio.minecraft.inventoryapi.manager.InventoryManager;
 import com.henryfabio.sqlprovider.connector.SQLConnector;
 import com.henryfabio.sqlprovider.executor.SQLExecutor;
 import com.yuhtin.quotes.saint.leagues.cache.ViewCache;
+import com.yuhtin.quotes.saint.leagues.clans.impl.UltimateClansAcessor;
 import com.yuhtin.quotes.saint.leagues.command.LeagueClanCommand;
 import com.yuhtin.quotes.saint.leagues.hook.HookModule;
-import com.yuhtin.quotes.saint.leagues.manager.SimpleClansAccessor;
+import com.yuhtin.quotes.saint.leagues.clans.ClanAcessor;
+import com.yuhtin.quotes.saint.leagues.clans.impl.SimpleClansAccessor;
 import com.yuhtin.quotes.saint.leagues.model.IntervalTime;
 import com.yuhtin.quotes.saint.leagues.module.AutoRewardModule;
 import com.yuhtin.quotes.saint.leagues.module.RankingModule;
@@ -16,13 +18,8 @@ import com.yuhtin.quotes.saint.leagues.repository.SQLProvider;
 import com.yuhtin.quotes.saint.leagues.repository.repository.EventRepository;
 import com.yuhtin.quotes.saint.leagues.repository.repository.TimedClanRepository;
 import lombok.Getter;
-import me.lucko.helper.Events;
 import me.lucko.helper.plugin.ExtendedJavaPlugin;
 import org.bukkit.Bukkit;
-import org.bukkit.event.block.Action;
-import org.bukkit.event.player.PlayerInteractEvent;
-
-import java.util.Calendar;
 
 import java.util.Calendar;
 
@@ -32,7 +29,7 @@ import java.util.Calendar;
 @Getter
 public class LeaguesPlugin extends ExtendedJavaPlugin {
 
-    private final SimpleClansAccessor simpleClansAccessor = new SimpleClansAccessor(Bukkit.getPluginManager());
+    private ClanAcessor clanAcessor;
 
     private ViewCache viewCache;
     private RankingModule rankingModule;
@@ -43,8 +40,10 @@ public class LeaguesPlugin extends ExtendedJavaPlugin {
         InventoryManager.enable(this);
         saveDefaultConfig();
 
-        if (!simpleClansAccessor.isValid()) {
-            getLogger().severe("SimpleClans not found! Disabling plugin...");
+        this.clanAcessor = lookupClanPlugin();
+        if (clanAcessor == null || !clanAcessor.isValid()) {
+            getLogger().severe("Clan plugin not found! Disabling plugin...");
+            getLogger().severe("Please use SimpleClans or UltimateClans");
             return;
         }
 
@@ -62,6 +61,13 @@ public class LeaguesPlugin extends ExtendedJavaPlugin {
         new ClansPlaceholder(this, RepositoryManager.getInstance()).register();
 
         getLogger().info("Plugin enabled!");
+    }
+
+    private ClanAcessor lookupClanPlugin() {
+        if (Bukkit.getPluginManager().getPlugin("SimpleClans") != null) return new SimpleClansAccessor(Bukkit.getPluginManager());
+        if (Bukkit.getPluginManager().getPlugin("UltimateClans") != null) return new UltimateClansAcessor(Bukkit.getPluginManager());
+
+        return null;
     }
 
     @Override

@@ -1,8 +1,8 @@
 package com.yuhtin.quotes.saint.leagues.module;
 
 import com.yuhtin.quotes.saint.leagues.LeaguesPlugin;
-import com.yuhtin.quotes.saint.leagues.repository.RepositoryManager;
 import com.yuhtin.quotes.saint.leagues.model.IntervalTime;
+import com.yuhtin.quotes.saint.leagues.repository.RepositoryManager;
 import com.yuhtin.quotes.saint.leagues.util.DiscordWebhook;
 import lombok.AllArgsConstructor;
 import org.bukkit.configuration.ConfigurationSection;

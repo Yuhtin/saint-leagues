@@ -1,10 +1,10 @@
 package com.yuhtin.quotes.saint.leagues.hook.impl;
 
 import com.yuhtin.quotes.saint.leagues.LeaguesPlugin;
-import com.yuhtin.quotes.saint.leagues.repository.RepositoryManager;
 import com.yuhtin.quotes.saint.leagues.hook.LeagueEventHook;
 import com.yuhtin.quotes.saint.leagues.model.LeagueEvent;
 import com.yuhtin.quotes.saint.leagues.model.LeagueEventType;
+import com.yuhtin.quotes.saint.leagues.repository.RepositoryManager;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import me.lucko.helper.Commands;
@@ -37,7 +37,7 @@ public class DragonSlayerHook extends LeagueEventHook {
                 .handler(context -> {
 
                     Player player = context.arg(0).parseOrFail(Player.class);
-                    String clanTag = instance.getSimpleClansAccessor().getClanTag(player);
+                    String clanTag = instance.getClanAcessor().getClanTag(player);
                     if (clanTag == null) {
                         instance.getLogger().warning("[DragonSlayer] Não foi possível encontrar o clã do jogador " + player.getName());
                         return;

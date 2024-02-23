@@ -50,7 +50,7 @@ public class AutoRewardModule implements TerminableModule {
         int i = 1;
         for (LeagueClan leagueClan : leagueClans) {
             this.instance.getLogger().info("[" + name + "] Recompensando o clã " + leagueClan.getTag() + " com o " + i + "º lugar!");
-            List<String> clanPlayers = this.instance.getSimpleClansAccessor().getClanPlayers(leagueClan.getTag());
+            List<String> clanPlayers = this.instance.getClanAcessor().getClanPlayers(leagueClan.getTag());
             if (clanPlayers == null) {
                 this.instance.getLogger().severe("[" + name + "] Não foi possível encontrar nenhum jogador no clã " + leagueClan.getTag() + "!");
                 break;

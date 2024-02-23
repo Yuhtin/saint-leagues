@@ -1,17 +1,19 @@
 package com.yuhtin.quotes.saint.leagues.command;
 
 import com.yuhtin.quotes.saint.leagues.LeaguesPlugin;
-import com.yuhtin.quotes.saint.leagues.repository.RepositoryManager;
 import com.yuhtin.quotes.saint.leagues.model.IntervalTime;
+import com.yuhtin.quotes.saint.leagues.model.LeagueEvent;
+import com.yuhtin.quotes.saint.leagues.model.LeagueEventType;
+import com.yuhtin.quotes.saint.leagues.repository.RepositoryManager;
 import lombok.AllArgsConstructor;
 import me.lucko.helper.Commands;
-import me.lucko.helper.command.argument.Argument;
 import me.lucko.helper.terminable.TerminableConsumer;
 import me.lucko.helper.terminable.module.TerminableModule;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
 import javax.annotation.Nonnull;
+import java.util.Arrays;
 
 /**
  * @author <a href="https://github.com/Yuhtin">Yuhtin</a>
@@ -32,11 +34,11 @@ public class LeagueClanCommand implements TerminableModule {
 
         Commands.create()
                 .assertPermission("league.admin")
-                .assertUsage("<add/remove> <player> <pontos> <mensal/trimestral> <motivo>")
+                .assertUsage("<add/remove> <clan> <pontos> <mensal/trimestral> <motivo>")
                 .handler(context -> {
                     String action = context.arg(0).parseOrFail(String.class);
                     String playerName = context.arg(1).parseOrFail(String.class);
-                    String clanTag = instance.getSimpleClansAccessor().getClanTag(playerName);
+                    String clanTag = instance.getClanAcessor().getClanTag(playerName);
                     if (clanTag == null) return;
 
                     int points = Math.max(0, context.arg(2).parseOrFail(Integer.class));
@@ -58,6 +60,17 @@ public class LeagueClanCommand implements TerminableModule {
                     String motive = builder.toString().trim();
 
                     RepositoryManager manager = RepositoryManager.getInstance();
+
+                    LeagueEvent leagueEvent = LeagueEvent.builder()
+                            .name(motive)
+                            .clanTag(clanTag)
+                            .leagueEventType(LeagueEventType.DEFAULT)
+                            .playersInvolved(Arrays.asList(playerName))
+                            .points(points)
+                            .build();
+
+                    instance.getEventRepository().insert(leagueEvent);
+
                     manager.addPoints(time, clanTag, total, motive);
 
                     int current = manager.getPointsByTag(time, clanTag);

@@ -35,14 +35,14 @@ public class ClansPlaceholder extends PlaceholderExpansion {
         String[] split = params.split("-");
         if (params.startsWith("clan")) {
             String playerName = split[1];
-            String clanTag = instance.getSimpleClansAccessor().getClanTag(playerName);
+            String clanTag = instance.getClanAcessor().getClanTag(playerName);
 
             return clanTag == null ? "..." : clanTag;
         }
 
         if (params.startsWith("points")) {
             IntervalTime interval = IntervalTime.valueOf(split[1].toUpperCase());
-            String clanTag = instance.getSimpleClansAccessor().getClanTag(player.getName());
+            String clanTag = instance.getClanAcessor().getClanTag(player.getName());
 
             return String.valueOf(manager.getPointsByTag(interval, clanTag));
         }

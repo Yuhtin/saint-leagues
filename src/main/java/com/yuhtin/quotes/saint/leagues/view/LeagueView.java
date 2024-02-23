@@ -5,10 +5,10 @@ import com.henryfabio.minecraft.inventoryapi.inventory.impl.simple.SimpleInvento
 import com.henryfabio.minecraft.inventoryapi.item.InventoryItem;
 import com.henryfabio.minecraft.inventoryapi.viewer.Viewer;
 import com.yuhtin.quotes.saint.leagues.LeaguesPlugin;
-import com.yuhtin.quotes.saint.leagues.repository.RepositoryManager;
 import com.yuhtin.quotes.saint.leagues.cache.ViewCache;
 import com.yuhtin.quotes.saint.leagues.model.IntervalTime;
 import com.yuhtin.quotes.saint.leagues.model.LeagueEvent;
+import com.yuhtin.quotes.saint.leagues.repository.RepositoryManager;
 import com.yuhtin.quotes.saint.leagues.repository.repository.TimedClanRepository;
 import com.yuhtin.quotes.saint.leagues.util.ItemBuilder;
 import org.bukkit.entity.Player;
@@ -34,7 +34,7 @@ public class LeagueView extends SimpleInventory {
         RepositoryManager manager = RepositoryManager.getInstance();
 
         Player player = viewer.getPlayer();
-        String clanTag = instance.getSimpleClansAccessor().getClanTag(player);
+        String clanTag = instance.getClanAcessor().getClanTag(player);
 
         int playerPoints = instance.getEventRepository()
                 .groupByPlayer(player.getName(), manager.getRepository(IntervalTime.MENSAL))

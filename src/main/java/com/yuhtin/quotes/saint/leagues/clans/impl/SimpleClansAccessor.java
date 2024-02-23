@@ -1,9 +1,9 @@
-package com.yuhtin.quotes.saint.leagues.manager;
+package com.yuhtin.quotes.saint.leagues.clans.impl;
 
+import com.yuhtin.quotes.saint.leagues.clans.ClanAcessor;
 import net.sacredlabyrinth.phaed.simpleclans.Clan;
 import net.sacredlabyrinth.phaed.simpleclans.ClanPlayer;
 import net.sacredlabyrinth.phaed.simpleclans.SimpleClans;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.PluginManager;
 
@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 /**
  * @author <a href="https://github.com/Yuhtin">Yuhtin</a>
  */
-public class SimpleClansAccessor {
+public class SimpleClansAccessor implements ClanAcessor {
 
     private final SimpleClans simpleClans;
 

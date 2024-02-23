@@ -3,10 +3,10 @@ package com.yuhtin.quotes.saint.leagues.hook.impl;
 import com.ystoreplugins.yeventos.event.EventType;
 import com.ystoreplugins.yeventos.event.PlayerWinEventEvent;
 import com.yuhtin.quotes.saint.leagues.LeaguesPlugin;
-import com.yuhtin.quotes.saint.leagues.repository.RepositoryManager;
 import com.yuhtin.quotes.saint.leagues.hook.LeagueEventHook;
 import com.yuhtin.quotes.saint.leagues.model.LeagueEvent;
 import com.yuhtin.quotes.saint.leagues.model.LeagueEventType;
+import com.yuhtin.quotes.saint.leagues.repository.RepositoryManager;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import me.lucko.helper.Events;
@@ -37,7 +37,7 @@ public class YEventsHook extends LeagueEventHook {
                 .handler(event -> {
                     Player player = event.getPlayer();
 
-                    String clanTag = instance.getSimpleClansAccessor().getClanTag(player);
+                    String clanTag = instance.getClanAcessor().getClanTag(player);
                     if (clanTag == null) {
                         instance.getLogger().warning("[yEventos] Não foi possível encontrar o clã do jogador " + player.getName());
                         return;

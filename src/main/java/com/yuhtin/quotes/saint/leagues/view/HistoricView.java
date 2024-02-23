@@ -11,15 +11,16 @@ import com.henryfabio.minecraft.inventoryapi.viewer.impl.paged.PagedViewer;
 import com.henryfabio.minecraft.inventoryapi.viewer.property.ViewerPropertyMap;
 import com.yuhtin.quotes.saint.leagues.LeaguesPlugin;
 import com.yuhtin.quotes.saint.leagues.cache.ViewCache;
-import com.yuhtin.quotes.saint.leagues.repository.RepositoryManager;
 import com.yuhtin.quotes.saint.leagues.model.IntervalTime;
 import com.yuhtin.quotes.saint.leagues.model.LeagueEvent;
 import com.yuhtin.quotes.saint.leagues.model.LeagueEventType;
+import com.yuhtin.quotes.saint.leagues.repository.RepositoryManager;
 import com.yuhtin.quotes.saint.leagues.repository.repository.EventRepository;
 import com.yuhtin.quotes.saint.leagues.repository.repository.TimedClanRepository;
 import com.yuhtin.quotes.saint.leagues.util.ItemBuilder;
 import lombok.val;
 import org.bukkit.Material;
+import org.bukkit.inventory.ItemStack;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -86,12 +87,16 @@ public class HistoricView extends PagedInventory {
         List<InventoryItemSupplier> items = new ArrayList<>();
         for (LeagueEvent event : events) {
             LeagueEventType leagueEventType = event.getLeagueEventType();
-            if (filterValue != -1 && filterValue != leagueEventType.ordinal()) continue;
+            if (filterValue != -1 && filterValue != (leagueEventType == null ? 2 : leagueEventType.ordinal() == 3 ? 2 : leagueEventType.ordinal())) continue;
 
             items.add(() -> {
-
                 List<String> playersInvolved = event.getPlayersInvolved();
-                return InventoryItem.of(new ItemBuilder(event.getLeagueEventType().getItemStack())
+
+                ItemStack itemStack = leagueEventType == null
+                        ? new ItemBuilder(instance.getConfig().getString("view.defaultEventHead", "/texture/6d0f4061bfb767a7f922a6ca7176f7a9b20709bd0512696beb15ea6fa98ca55c")).wrap()
+                        : event.getLeagueEventType().getItemStack();
+
+                return InventoryItem.of(new ItemBuilder(itemStack)
                         .name(instance.getConfig().getString("view.historic.name")
                                 .replace("%event%", event.getName())
                                 .replace("%id%", event.getId()))

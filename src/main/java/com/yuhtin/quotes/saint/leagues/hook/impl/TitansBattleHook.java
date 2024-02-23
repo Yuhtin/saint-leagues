@@ -1,10 +1,10 @@
 package com.yuhtin.quotes.saint.leagues.hook.impl;
 
 import com.yuhtin.quotes.saint.leagues.LeaguesPlugin;
-import com.yuhtin.quotes.saint.leagues.repository.RepositoryManager;
 import com.yuhtin.quotes.saint.leagues.hook.LeagueEventHook;
 import com.yuhtin.quotes.saint.leagues.model.LeagueEvent;
 import com.yuhtin.quotes.saint.leagues.model.LeagueEventType;
+import com.yuhtin.quotes.saint.leagues.repository.RepositoryManager;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import me.lucko.helper.Events;
@@ -40,7 +40,7 @@ public class TitansBattleHook extends LeagueEventHook {
                     List<Warrior> players = event.getPlayers();
                     List<String> filteredPlayers = filterPlayersWithClan(players);
 
-                    String clanTag = instance.getSimpleClansAccessor().getClanTag(filteredPlayers.get(0));
+                    String clanTag = instance.getClanAcessor().getClanTag(filteredPlayers.get(0));
                     if (clanTag == null) {
                         instance.getLogger().warning("[TitansBattle] Não foi possível encontrar o clã do jogador " + filteredPlayers.get(0));
                         return;
@@ -77,7 +77,7 @@ public class TitansBattleHook extends LeagueEventHook {
     private List<String> filterPlayersWithClan(List<Warrior> players) {
         return players.stream()
                 .map(Warrior::getName)
-                .filter(name -> instance.getSimpleClansAccessor().getClanTag(name) != null)
+                .filter(name -> instance.getClanAcessor().getClanTag(name) != null)
                 .collect(Collectors.toList());
     }
 }

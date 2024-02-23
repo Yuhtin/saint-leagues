@@ -1,11 +1,10 @@
 package com.yuhtin.quotes.saint.leagues.repository.repository;
 
 import com.henryfabio.sqlprovider.executor.SQLExecutor;
-import com.yuhtin.quotes.saint.leagues.model.IntervalTime;
 import com.yuhtin.quotes.saint.leagues.model.LeagueEvent;
 import com.yuhtin.quotes.saint.leagues.model.LeagueEventType;
-import com.yuhtin.quotes.saint.leagues.repository.adapters.LeagueEventAdapter;
 import com.yuhtin.quotes.saint.leagues.repository.adapters.EmptyAdapter;
+import com.yuhtin.quotes.saint.leagues.repository.adapters.LeagueEventAdapter;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 

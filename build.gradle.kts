@@ -6,7 +6,7 @@ plugins {
     id("net.minecrell.plugin-yml.bukkit") version "0.5.1"
 }
 
-version = "2.1.0"
+version = "2.2.0"
 
 bukkit {
     name = "leagues"
@@ -36,7 +36,10 @@ dependencies {
     compileOnly("me.lucko:helper:5.6.10")
     compileOnly("com.github.PlaceholderAPI:PlaceholderAPI:2.10.9")
     compileOnly("com.github.decentsoftware-eu:decentholograms:2.8.3")
+
     compileOnly("net.sacredlabyrinth.phaed.simpleclans:SimpleClans:2.15.2")
+    compileOnly("com.github.UlrichBR:UClansV7-API:7.4.0-r1")
+
     compileOnly("com.github.RoinujNosde:TitansBattle:6.2.0")
     compileOnly("com.github.NuVotifier:NuVotifier:2.7.2")
 
