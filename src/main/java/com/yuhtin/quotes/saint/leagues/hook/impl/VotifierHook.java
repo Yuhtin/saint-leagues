@@ -4,12 +4,16 @@ import com.vexsoftware.votifier.model.Vote;
 import com.vexsoftware.votifier.model.VotifierEvent;
 import com.yuhtin.quotes.saint.leagues.LeaguesPlugin;
 import com.yuhtin.quotes.saint.leagues.hook.LeagueEventHook;
+import com.yuhtin.quotes.saint.leagues.model.LeagueEvent;
+import com.yuhtin.quotes.saint.leagues.model.LeagueEventType;
 import com.yuhtin.quotes.saint.leagues.repository.RepositoryManager;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import me.lucko.helper.Events;
 import me.lucko.helper.terminable.TerminableConsumer;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.Arrays;
 
 /**
  * @author <a href="https://github.com/Yuhtin">Yuhtin</a>
@@ -42,6 +46,16 @@ public class VotifierHook extends LeagueEventHook {
 
                     String name = instance.getConfig().getString(path + ".name");
                     int points = instance.getConfig().getInt(path + ".points");
+
+                    LeagueEvent leagueEvent = LeagueEvent.builder()
+                            .name(name)
+                            .clanTag(clanTag)
+                            .leagueEventType(LeagueEventType.DEFAULT)
+                            .playersInvolved(Arrays.asList(username))
+                            .points(points)
+                            .build();
+
+                    instance.getEventRepository().insert(leagueEvent);
 
                     RepositoryManager.getInstance().addPoints(clanTag, points, name);
                 }).bindWith(consumer);

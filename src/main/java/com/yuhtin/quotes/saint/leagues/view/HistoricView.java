@@ -101,8 +101,8 @@ public class HistoricView extends PagedInventory {
                                 .replace("%event%", event.getName())
                                 .replace("%id%", event.getId()))
                         .setLore(instance.getConfig().getStringList("view.historic.lore").stream().map(line -> line
-                                        .replace("%date%", event.getFormattedDate())
-                                        .replace("%points%", String.valueOf(event.getPoints()))
+                                        .replace("%data%", event.getFormattedDate())
+                                        .replace("%pontos%", String.valueOf(event.getPoints()))
                                         .replace("%clan%", event.getClanTag())
                                         .replace("%players%", String.join(", ", playersInvolved)))
                                 .collect(Collectors.toList())

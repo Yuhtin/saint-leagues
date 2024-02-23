@@ -14,8 +14,8 @@ bukkit {
     version = "${project.version}"
     authors = listOf("Yuhtin")
     apiVersion = "1.13"
-    depend = listOf("helper", "SimpleClans", "DecentHolograms", "PlaceholderAPI")
-    softDepend = listOf("DragonSlayer", "TitansBattle", "yEventos", "NuVotifier")
+    depend = listOf("helper", "DecentHolograms", "PlaceholderAPI")
+    softDepend = listOf("SimpleClans", "UltimateClans", "DragonSlayer", "TitansBattle", "yEventos", "NuVotifier")
 }
 
 
