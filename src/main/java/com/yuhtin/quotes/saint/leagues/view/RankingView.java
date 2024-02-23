@@ -9,8 +9,9 @@ import com.henryfabio.minecraft.inventoryapi.viewer.Viewer;
 import com.henryfabio.minecraft.inventoryapi.viewer.configuration.border.Border;
 import com.henryfabio.minecraft.inventoryapi.viewer.impl.paged.PagedViewer;
 import com.yuhtin.quotes.saint.leagues.LeaguesPlugin;
-import com.yuhtin.quotes.saint.leagues.repository.RepositoryManager;
+import com.yuhtin.quotes.saint.leagues.cache.ViewCache;
 import com.yuhtin.quotes.saint.leagues.model.IntervalTime;
+import com.yuhtin.quotes.saint.leagues.repository.RepositoryManager;
 import com.yuhtin.quotes.saint.leagues.util.BannerAlphabetic;
 import com.yuhtin.quotes.saint.leagues.util.ItemBuilder;
 import lombok.val;
@@ -31,8 +32,11 @@ public class RankingView extends PagedInventory {
 
     private final Map<String, Integer> sorterType = new HashMap<>();
 
-    public RankingView() {
+    private final LeaguesPlugin instance;
+
+    public RankingView(ViewCache viewCache) {
         super("league.ranking", "Ranking", 5 * 9);
+        this.instance = viewCache.getPlugin();
     }
 
     @Override
@@ -86,11 +90,13 @@ public class RankingView extends PagedInventory {
                 int points = manager.getPointsByTag(intervalTime, clanTag);
 
                 return InventoryItem.of(new ItemBuilder(itemStack)
-                        .name("&a" + clanTag + " &6(#" + position + ")")
+                        .name(instance.getConfig().getString("view.ranking.name")
+                                .replace("%clan%", clanTag)
+                                .replace("%position%", String.valueOf(position)))
                         .hideAttributes()
-                        .setLore(
-                                "&fPontos: &e" + points,
-                                "&fParticipações em eventos: &e" + clanAppearences
+                        .setLore(instance.getConfig().getString("view.ranking.lore")
+                                .replace("%pontos%", String.valueOf(points))
+                                .replace("%participacoes%", String.valueOf(clanAppearences))
                         ).wrap());
             });
         }
@@ -101,16 +107,19 @@ public class RankingView extends PagedInventory {
     private InventoryItem sortRankingItem(Viewer viewer) {
         AtomicInteger currentFilter = new AtomicInteger(sorterType.getOrDefault(viewer.getName(), 0));
 
-        return InventoryItem.of(new ItemBuilder(Material.SUNFLOWER)
-                        .name("&6Selecionar período")
-                        .setLore(
-                                "&7Selecione o período que deseja ver",
-                                "",
-                                getColorByFilter(currentFilter.get(), 0) + " Mensal",
-                                getColorByFilter(currentFilter.get(), 1) + " Trimestral",
-                                "",
-                                "&aClique para mudar o período."
-                        )
+        List<String> lore = new ArrayList<>();
+        for (String line : instance.getConfig().getStringList("view.period.lore")) {
+            if (line.contains("%info%")) {
+                lore.add(getColorByFilter(currentFilter.get(), 0) + " Mensal");
+                lore.add(getColorByFilter(currentFilter.get(), 1) + " Trimestral");
+            } else {
+                lore.add(line);
+            }
+        }
+
+        return InventoryItem.of(new ItemBuilder(Material.valueOf(instance.getConfig().getString("view.period.material")))
+                        .name(instance.getConfig().getString("view.period.name"))
+                        .setLore(lore)
                         .wrap())
                 .defaultCallback(event -> {
                     sorterType.put(viewer.getName(), currentFilter.incrementAndGet() > 1 ? 0 : currentFilter.get());
@@ -119,7 +128,7 @@ public class RankingView extends PagedInventory {
     }
 
     private String getColorByFilter(int currentFilter, int loopFilter) {
-        return currentFilter == loopFilter ? " &b▶" : "&8";
+        return currentFilter == loopFilter ? " " + instance.getConfig().getString("view.filterColor") + "▶" : "&8";
     }
 
 }

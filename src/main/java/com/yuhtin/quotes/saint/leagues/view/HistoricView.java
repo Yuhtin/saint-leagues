@@ -10,6 +10,7 @@ import com.henryfabio.minecraft.inventoryapi.viewer.configuration.border.Border;
 import com.henryfabio.minecraft.inventoryapi.viewer.impl.paged.PagedViewer;
 import com.henryfabio.minecraft.inventoryapi.viewer.property.ViewerPropertyMap;
 import com.yuhtin.quotes.saint.leagues.LeaguesPlugin;
+import com.yuhtin.quotes.saint.leagues.cache.ViewCache;
 import com.yuhtin.quotes.saint.leagues.repository.RepositoryManager;
 import com.yuhtin.quotes.saint.leagues.model.IntervalTime;
 import com.yuhtin.quotes.saint.leagues.model.LeagueEvent;
@@ -22,6 +23,7 @@ import org.bukkit.Material;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 /**
  * @author <a href="https://github.com/Yuhtin">Yuhtin</a>
@@ -30,9 +32,11 @@ public class HistoricView extends PagedInventory {
 
     private final Map<String, Integer> rankingSorterType = new HashMap<>();
     private final Map<String, Integer> periodSorterType = new HashMap<>();
+    private final LeaguesPlugin instance;
 
-    public HistoricView() {
+    public HistoricView(ViewCache viewCache) {
         super("league.historic", "Historico", 5 * 9);
+        this.instance = viewCache.getPlugin();
     }
 
     @Override
@@ -72,7 +76,7 @@ public class HistoricView extends PagedInventory {
         IntervalTime intervalTime = IntervalTime.values()[periodFilter];
         TimedClanRepository timedRepository = RepositoryManager.getInstance().getRepository(intervalTime);
 
-        EventRepository eventRepository = LeaguesPlugin.getInstance().getEventRepository();
+        EventRepository eventRepository = instance.getEventRepository();
         Set<LeagueEvent> events = playerName != null
                 ? eventRepository.groupByPlayer(playerName, timedRepository)
                 : eventRepository.findAll(timedRepository);
@@ -88,13 +92,15 @@ public class HistoricView extends PagedInventory {
 
                 List<String> playersInvolved = event.getPlayersInvolved();
                 return InventoryItem.of(new ItemBuilder(event.getLeagueEventType().getItemStack())
-                        .name("&a" + event.getName() + " &8(#" + event.getId() + ")")
-                        .setLore(
-                                "&fData: &e" + event.getFormattedDate(),
-                                "&fPontos: &e" + event.getPoints(),
-                                "",
-                                "&fClan vencedor: &e" + event.getClanTag(),
-                                "&fJogadores do clan: &e" + String.join(", ", playersInvolved)
+                        .name(instance.getConfig().getString("view.historic.name")
+                                .replace("%event%", event.getName())
+                                .replace("%id%", event.getId()))
+                        .setLore(instance.getConfig().getStringList("view.historic.lore").stream().map(line -> line
+                                        .replace("%date%", event.getFormattedDate())
+                                        .replace("%points%", String.valueOf(event.getPoints()))
+                                        .replace("%clan%", event.getClanTag())
+                                        .replace("%players%", String.join(", ", playersInvolved)))
+                                .collect(Collectors.toList())
                         ).wrap());
 
             });
@@ -106,16 +112,19 @@ public class HistoricView extends PagedInventory {
     private InventoryItem periodFilter(Viewer viewer) {
         AtomicInteger currentFilter = new AtomicInteger(periodSorterType.getOrDefault(viewer.getName(), 0));
 
-        return InventoryItem.of(new ItemBuilder(Material.SUNFLOWER)
-                        .name("&6Selecionar período")
-                        .setLore(
-                                "&7Selecione o período que deseja ver",
-                                "",
-                                getColorByFilter(currentFilter.get(), 0) + " Mensal",
-                                getColorByFilter(currentFilter.get(), 1) + " Trimestral",
-                                "",
-                                "&aClique para mudar o período."
-                        )
+        List<String> lore = new ArrayList<>();
+        for (String line : instance.getConfig().getStringList("view.period.lore")) {
+            if (line.contains("%info%")) {
+                lore.add(getColorByFilter(currentFilter.get(), 0) + " Mensal");
+                lore.add(getColorByFilter(currentFilter.get(), 1) + " Trimestral");
+            } else {
+                lore.add(line);
+            }
+        }
+
+        return InventoryItem.of(new ItemBuilder(Material.valueOf(instance.getConfig().getString("view.period.material")))
+                        .name(instance.getConfig().getString("view.period.name"))
+                        .setLore(lore)
                         .wrap())
                 .defaultCallback(event -> {
                     periodSorterType.put(viewer.getName(), currentFilter.incrementAndGet() > 1 ? 0 : currentFilter.get());
@@ -125,18 +134,22 @@ public class HistoricView extends PagedInventory {
 
     private InventoryItem sortRankingItem(Viewer viewer) {
         AtomicInteger currentFilter = new AtomicInteger(rankingSorterType.getOrDefault(viewer.getName(), -1));
-        return InventoryItem.of(new ItemBuilder(Material.HOPPER)
-                        .name("&6Ordenar ranking")
-                        .setLore(
-                                "&7Ordene o ranking da maneira deseja",
-                                "",
-                                getColorByFilter(currentFilter.get(), -1) + " Todos",
-                                getColorByFilter(currentFilter.get(), 0) + " Matar o dragão",
-                                getColorByFilter(currentFilter.get(), 1) + " Eventos de clan",
-                                getColorByFilter(currentFilter.get(), 2) + " Outros eventos",
-                                "",
-                                "&aClique para mudar o tipo de ordenação."
-                        )
+
+        List<String> lore = new ArrayList<>();
+        for (String line : instance.getConfig().getStringList("view.sortRanking.lore")) {
+            if (line.contains("%info%")) {
+                lore.add(getColorByFilter(currentFilter.get(), -1) + " Todos");
+                lore.add(getColorByFilter(currentFilter.get(), 0) + " Matar o dragão");
+                lore.add(getColorByFilter(currentFilter.get(), 1) + " Eventos de clan");
+                lore.add(getColorByFilter(currentFilter.get(), 2) + " Outros eventos");
+            } else {
+                lore.add(line);
+            }
+        }
+
+        return InventoryItem.of(new ItemBuilder(Material.valueOf(instance.getConfig().getString("view.sortRanking.material")))
+                        .name(instance.getConfig().getString("view.sortRanking.name"))
+                        .setLore(lore)
                         .wrap())
                 .defaultCallback(event -> {
                     rankingSorterType.put(viewer.getName(), currentFilter.incrementAndGet() > 2 ? -1 : currentFilter.get());
@@ -145,7 +158,7 @@ public class HistoricView extends PagedInventory {
     }
 
     private String getColorByFilter(int currentFilter, int loopFilter) {
-        return currentFilter == loopFilter ? " &b▶" : "&8";
+        return currentFilter == loopFilter ? " " + instance.getConfig().getString("view.filterColor") + "▶" : "&8";
     }
 
 }

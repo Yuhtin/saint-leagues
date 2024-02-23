@@ -4,14 +4,19 @@ import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 import com.mojang.authlib.properties.PropertyMap;
 import org.apache.commons.codec.binary.Base64;
+import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Material;
+import org.bukkit.Server;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.inventory.meta.SkullMeta;
+import org.bukkit.profile.PlayerProfile;
+import org.bukkit.profile.PlayerTextures;
 
+import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
@@ -36,34 +41,35 @@ public class ItemBuilder {
     }
 
     public ItemBuilder(String link) {
-        item = new ItemStack(Material.PLAYER_HEAD);
-
-        if (!link.startsWith("/texture/")) {
-            SkullMeta meta = (SkullMeta) item.getItemMeta();
-            meta.setOwner(link);
-
-            item.setItemMeta(meta);
+        Material material = Material.getMaterial(link);
+        if (material != null) {
+            item = new ItemStack(material);
             return;
         }
 
-        link = "http://textures.minecraft.net" + link;
+        item = new ItemStack(Material.PLAYER_HEAD);
 
-        GameProfile profile = new GameProfile(UUID.randomUUID(), "");
-        PropertyMap propertyMap = profile.getProperties();
-        if (propertyMap == null) {
-            throw new IllegalStateException("Profile doesn't contain a property map");
+        SkullMeta meta = (SkullMeta) item.getItemMeta();
+        if (meta == null) return;
+
+        PlayerProfile profile;
+
+        if (!link.startsWith("/texture/")) {
+            profile = Bukkit.createPlayerProfile(link);
+        } else {
+            profile = Bukkit.createPlayerProfile(UUID.randomUUID(), "");
+            PlayerTextures textures = profile.getTextures();
+
+            link = "http://textures.minecraft.net" + link;
+            try {
+                textures.setSkin(new URL(link));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
 
-        byte[] encodedData = new Base64().encode(String.format("{textures:{SKIN:{url:\"%s\"}}}", link).getBytes());
-        propertyMap.put("textures", new Property("textures", new String(encodedData)));
-
-
-        ItemMeta headMeta = item.getItemMeta();
-        Class<?> headMetaClass = headMeta.getClass();
-
-        Reflections.getField(headMetaClass, "profile", GameProfile.class).set(headMeta, profile);
-
-        item.setItemMeta(headMeta);
+        meta.setOwnerProfile(profile);
+        item.setItemMeta(meta);
     }
 
     public ItemBuilder(Material type, Color color) {

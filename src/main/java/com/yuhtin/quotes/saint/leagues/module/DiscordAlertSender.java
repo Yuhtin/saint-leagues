@@ -5,6 +5,7 @@ import com.yuhtin.quotes.saint.leagues.repository.RepositoryManager;
 import com.yuhtin.quotes.saint.leagues.model.IntervalTime;
 import com.yuhtin.quotes.saint.leagues.util.DiscordWebhook;
 import lombok.AllArgsConstructor;
+import org.bukkit.configuration.ConfigurationSection;
 
 import java.awt.*;
 import java.io.IOException;
@@ -38,16 +39,32 @@ public class DiscordAlertSender {
         DiscordWebhook discordWebhook = new DiscordWebhook(link);
         DiscordWebhook.EmbedObject embedObject = new DiscordWebhook.EmbedObject();
 
-        embedObject.setTitle("SAINT LIGA - " + tag + " <a:1Espada:1149729957434634403>");
-        embedObject.setDescription("O clã " + tag + " ganhou " + points + " pontos por " + motive.toLowerCase() + ".");
-        embedObject.setFooter("Que a vitória seja dos mais fortes! Rede Saint", "");
-        embedObject.setColor(Color.RED);
+        ConfigurationSection section = instance.getConfig().getConfigurationSection("webhook");
 
-        embedObject.addField("CLAN", tag, true);
-        embedObject.addField("PONTOS", String.valueOf(points), true);
-        embedObject.addField("RAZÃO", motive, true);
-        embedObject.addField("PONTUAÇÃO MENSAL", mensalPoints + " pontos - #" + mensalRanking, true);
-        embedObject.addField("PONTUAÇÃO TRIMESTRAL", trimestralPoints + " pontos - #" + trimestralRanking, true);
+        embedObject.setTitle(section.getString("title", "Saint Leagues"));
+
+        embedObject.setDescription(section.getString("description", "Aconteceu algo importante no servidor!")
+                .replace("%clan%", tag)
+                .replace("%pontos%", String.valueOf(points))
+                .replace("%motivo%", motive));
+
+        embedObject.setFooter(section.getString("footer", "Saint Leagues - " + tag), "");
+
+        embedObject.setColor(Color.getColor(section.getString("color", "#ffffff")));
+
+        section.getConfigurationSection("fields").getKeys(false).forEach(key -> {
+            String value = section.getString("fields." + key);
+            if (value == null) return;
+
+            embedObject.addField(key, value
+                    .replace("%clan%", tag)
+                    .replace("%pontos%", String.valueOf(points))
+                    .replace("%motivo%", motive)
+                    .replace("%mensal-position%", String.valueOf(mensalRanking))
+                    .replace("%trimestral-position%", String.valueOf(trimestralRanking))
+                    .replace("%mensal-points%", String.valueOf(mensalPoints))
+                    .replace("%trimestral-points%", String.valueOf(trimestralPoints)), true);
+        });
 
         discordWebhook.addEmbed(embedObject);
 

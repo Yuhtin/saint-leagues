@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 import java.util.Calendar;
+import java.util.Date;
 
 /**
  * @author <a href="https://github.com/Yuhtin">Yuhtin</a>
@@ -12,23 +13,22 @@ import java.util.Calendar;
 @Getter
 
 public enum IntervalTime {
+
     MENSAL(1),
-    TRIMESTRAL(3);
+    TRIMESTRAL(3),
+    ;
 
     private final int months;
 
-    public int getMonths() {
-        return this.months;
-    }
-
     public long getAddedDate() {
         Calendar calendar = Calendar.getInstance();
-        calendar.add(2, this.months);
+        calendar.add(Calendar.MONTH, months);
 
         return calendar.getTimeInMillis();
     }
 
     public String fancyName() {
-        return "" + name().charAt(0) + name().charAt(0);
+        return name().charAt(0) + name().substring(1).toLowerCase();
     }
+
 }

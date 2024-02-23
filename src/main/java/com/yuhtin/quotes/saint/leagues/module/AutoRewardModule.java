@@ -31,8 +31,9 @@ public class AutoRewardModule implements TerminableModule {
     public void setup(@NotNull TerminableConsumer consumer) {
         Schedulers.sync().runRepeating(runnable -> {
             for (TimedClanRepository repository : RepositoryManager.getInstance().getRepositories().values()) {
-                if (repository.getFinalTime() > System.currentTimeMillis() || !runReward(repository))
-                    continue;
+                if (repository.getFinalTime() > System.currentTimeMillis()) continue;
+                if (!runReward(repository)) continue;
+
                 saveLog(repository);
                 resetRepository(repository);
             }
@@ -67,47 +68,47 @@ public class AutoRewardModule implements TerminableModule {
     }
 
     private void saveLog(TimedClanRepository repository) {
-        File file = new File(this.instance.getDataFolder(), getLogFileLocation(repository.getIntervalTime()));
-        if (!file.exists())
+        File file = new File(instance.getDataFolder(), getLogFileLocation(repository.getIntervalTime()));
+        if (!file.exists()) {
             try {
                 file.createNewFile();
             } catch (Exception exception) {
                 exception.printStackTrace();
                 return;
             }
-        try {
-            BufferedWriter writer = new BufferedWriter(new FileWriter(file, false));
-            try {
-                writer.write("Clã com mais pontos no ranking " + repository.getIntervalTime().name().toLowerCase() + ":\n\n");
-                for (LeagueClan leagueClan : repository.orderByPoints())
-                    writer.write(leagueClan.getTag() + " - " + leagueClan.getTag() + "\n");
-                writer.flush();
-                writer.close();
-            } catch (Throwable throwable) {
-                try {
-                    writer.close();
-                } catch (Throwable throwable1) {
-                    throwable.addSuppressed(throwable1);
-                }
-                throw throwable;
+        }
+
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(file, false))) {
+            writer.write("Clãs com mais pontos no ranking " + repository.getIntervalTime().name().toLowerCase() + ":\n\n");
+            for (LeagueClan leagueClan : repository.orderByPoints()) {
+                writer.write(leagueClan.getTag() + " - " + leagueClan.getPoints() + "\n");
             }
+
+            writer.flush();
         } catch (Exception exception) {
             exception.printStackTrace();
         }
+
     }
 
     private String getLogFileLocation(IntervalTime intervalTime) {
         Calendar calendar = Calendar.getInstance();
-        String formatedDate = calendar.get(Calendar.DAY_OF_MONTH) + "-" + calendar.get(Calendar.MONTH) + "-" + calendar.get(Calendar.YEAR);
+
+        String formatedDate = calendar.get(Calendar.DAY_OF_MONTH)
+                + "-" + (calendar.get(Calendar.MONTH) + 1)
+                + "-" + calendar.get(Calendar.YEAR);
+
         return "past-leagues/" + intervalTime.name().toLowerCase() + "/" + formatedDate + ".txt";
     }
 
     private void resetRepository(TimedClanRepository repository) {
         String name = repository.getIntervalTime().name();
+
         repository.setInitialTime(System.currentTimeMillis());
-        this.instance.getConfig().set("initial-time." + name, repository.getInitialTime());
-        this.instance.getConfig().set("reset-time." + name, repository.getIntervalTime().getAddedDate());
-        this.instance.saveConfig();
+        instance.getConfig().set("initial-time." + name, repository.getInitialTime());
+        instance.getConfig().set("reset-time." + name, repository.getIntervalTime().getAddedDate());
+        instance.saveConfig();
+
         repository.recreateTable();
         this.instance.getLogger().info("Sistema " + name.toLowerCase() + " reiniciado com sucesso!");
     }

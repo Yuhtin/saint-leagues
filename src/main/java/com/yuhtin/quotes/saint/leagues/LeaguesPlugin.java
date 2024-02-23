@@ -3,8 +3,6 @@ package com.yuhtin.quotes.saint.leagues;
 import com.henryfabio.minecraft.inventoryapi.manager.InventoryManager;
 import com.henryfabio.sqlprovider.connector.SQLConnector;
 import com.henryfabio.sqlprovider.executor.SQLExecutor;
-import com.yuhtin.quotes.saint.leagues.placeholder.ClansPlaceholder;
-import com.yuhtin.quotes.saint.leagues.repository.RepositoryManager;
 import com.yuhtin.quotes.saint.leagues.cache.ViewCache;
 import com.yuhtin.quotes.saint.leagues.command.LeagueClanCommand;
 import com.yuhtin.quotes.saint.leagues.hook.HookModule;
@@ -12,12 +10,19 @@ import com.yuhtin.quotes.saint.leagues.manager.SimpleClansAccessor;
 import com.yuhtin.quotes.saint.leagues.model.IntervalTime;
 import com.yuhtin.quotes.saint.leagues.module.AutoRewardModule;
 import com.yuhtin.quotes.saint.leagues.module.RankingModule;
+import com.yuhtin.quotes.saint.leagues.placeholder.ClansPlaceholder;
+import com.yuhtin.quotes.saint.leagues.repository.RepositoryManager;
 import com.yuhtin.quotes.saint.leagues.repository.SQLProvider;
 import com.yuhtin.quotes.saint.leagues.repository.repository.EventRepository;
 import com.yuhtin.quotes.saint.leagues.repository.repository.TimedClanRepository;
 import lombok.Getter;
+import me.lucko.helper.Events;
 import me.lucko.helper.plugin.ExtendedJavaPlugin;
 import org.bukkit.Bukkit;
+import org.bukkit.event.block.Action;
+import org.bukkit.event.player.PlayerInteractEvent;
+
+import java.util.Calendar;
 
 import java.util.Calendar;
 
@@ -28,21 +33,20 @@ import java.util.Calendar;
 public class LeaguesPlugin extends ExtendedJavaPlugin {
 
     private final SimpleClansAccessor simpleClansAccessor = new SimpleClansAccessor(Bukkit.getPluginManager());
-    private final ViewCache viewCache = new ViewCache();
 
+    private ViewCache viewCache;
     private RankingModule rankingModule;
     private EventRepository eventRepository;
 
     @Override
     protected void enable() {
+        InventoryManager.enable(this);
         saveDefaultConfig();
 
         if (!simpleClansAccessor.isValid()) {
             getLogger().severe("SimpleClans not found! Disabling plugin...");
             return;
         }
-
-        InventoryManager.enable(this);
 
         initDatabase();
 
@@ -52,6 +56,8 @@ public class LeaguesPlugin extends ExtendedJavaPlugin {
 
         this.rankingModule = new RankingModule(this, RepositoryManager.getInstance());
         bindModule(rankingModule);
+
+        this.viewCache = new ViewCache(this);
 
         new ClansPlaceholder(this, RepositoryManager.getInstance()).register();
 
@@ -77,17 +83,20 @@ public class LeaguesPlugin extends ExtendedJavaPlugin {
 
     private void initCache(SQLExecutor sqlExecutor) {
         for (IntervalTime time : IntervalTime.values()) {
-            long initialTime = getConfig().getLong("initial-time." + time.name().toUpperCase(), -1L);
-            if (initialTime == -1L) {
+            long initialTime = getConfig().getLong("initial-time." + time.name().toUpperCase(), -1);
+            if (initialTime == -1) {
                 getConfig().set("initial-time." + time.name().toUpperCase(), System.currentTimeMillis());
                 saveConfig();
+
                 initialTime = System.currentTimeMillis();
             }
-            long resetTime = getConfig().getLong("reset-time." + time.name().toUpperCase(), -1L);
-            if (resetTime == -1L) {
+
+            long resetTime = getConfig().getLong("reset-time." + time.name().toUpperCase(), -1);
+            if (resetTime == -1) {
                 Calendar calendar = Calendar.getInstance();
                 calendar.setTimeInMillis(initialTime);
-                calendar.add(2, time.getMonths());
+                calendar.add(Calendar.MONTH, time.getMonths());
+
                 getConfig().set("reset-time." + time.name().toUpperCase(), calendar.getTimeInMillis());
                 saveConfig();
             }

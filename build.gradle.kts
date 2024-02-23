@@ -6,7 +6,7 @@ plugins {
     id("net.minecrell.plugin-yml.bukkit") version "0.5.1"
 }
 
-version = "2.0.0"
+version = "2.1.0"
 
 bukkit {
     name = "leagues"
@@ -43,7 +43,6 @@ dependencies {
     compileOnly("com.mojang:authlib:1.5.25")
 
     compileOnly(fileTree("/libs"))
-
 
     implementation("com.github.HenryFabio:inventory-api:main-SNAPSHOT")
     implementation("com.github.HenryFabio:sql-provider:9561f20fd2")

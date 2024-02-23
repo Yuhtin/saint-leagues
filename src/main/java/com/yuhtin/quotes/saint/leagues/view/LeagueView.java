@@ -24,13 +24,13 @@ public class LeagueView extends SimpleInventory {
     private final ViewCache viewCache;
 
     public LeagueView(ViewCache viewCache) {
-        super("league.main", "Saint Ligas", 3 * 9);
+        super("league.main", viewCache.getPlugin().getConfig().getString("view.mainInventoryName"), 3 * 9);
         this.viewCache = viewCache;
     }
 
     @Override
     protected void configureInventory(Viewer viewer, InventoryEditor editor) {
-        LeaguesPlugin instance = LeaguesPlugin.getInstance();
+        LeaguesPlugin instance = viewCache.getPlugin();
         RepositoryManager manager = RepositoryManager.getInstance();
 
         Player player = viewer.getPlayer();
@@ -43,29 +43,37 @@ public class LeagueView extends SimpleInventory {
                 .reduce(0, Integer::sum);
 
         List<String> lore = new ArrayList<>();
-        lore.add("&fSeus pontos: &e" + playerPoints);
-
         if (clanTag == null) {
-            lore.add("&fSeu clan: &cNenhum");
+            instance.getConfig().getStringList("view.profile.noClanLore")
+                    .stream()
+                    .map(line -> line.replace("%pontos%", String.valueOf(playerPoints)))
+                    .forEach(lore::add);
         } else {
-            lore.add("&fSeu clan: &e" + clanTag);
-            lore.add("");
+            for (String line : instance.getConfig().getStringList("view.profile.clanLore")) {
+                if (line.contains("%info%")) {
+                    for (IntervalTime time : IntervalTime.values()) {
+                        TimedClanRepository repository = manager.getRepository(time);
 
-            for (IntervalTime time : IntervalTime.values()) {
-                TimedClanRepository repository = manager.getRepository(time);
+                        int points = repository.getPointsByTag(clanTag);
+                        int position = repository.getPositionByClan(clanTag);
 
-                int points = repository.getPointsByTag(clanTag);
-                int position = repository.getPositionByClan(clanTag);
-
-                lore.add(" &f" + time.fancyName() + ": &e" + points + " pontos &6(#" + position + ")");
+                        lore.add(instance.getConfig().getString("view.clanRankingInfo")
+                                .replace("%position%", String.valueOf(position))
+                                .replace("%pontos%", String.valueOf(points))
+                                .replace("%time%", time.fancyName())
+                        );
+                    }
+                } else {
+                    lore.add(line
+                            .replace("%pontos%", String.valueOf(playerPoints))
+                            .replace("%clan%", clanTag)
+                    );
+                }
             }
         }
 
-        lore.add("");
-        lore.add("&aClique para ver os eventos que participou!");
-
         editor.setItem(11, InventoryItem.of(new ItemBuilder(player.getName())
-                        .name("&aSeu Perfil")
+                        .name(instance.getConfig().getString("view.profile.name"))
                         .setLore(lore)
                         .wrap())
                 .defaultCallback(callback -> viewCache.getHistoricView().openInventory(
@@ -74,40 +82,28 @@ public class LeagueView extends SimpleInventory {
                 ))
         );
 
-        editor.setItem(13, InventoryItem.of(new ItemBuilder("/texture/a2629f2682dcee30f5855b1e5427cc4bee73d18a276fafc520d693b40ca81b22")
-                        .name("&aRecompensas")
-                        .setLore(
-                                "&7Veja as recompensas que o clan",
-                                "&7pode receber ao final da liga",
-                                "",
-                                "&aClique para ver as recompensas!"
-                        ).wrap())
+        editor.setItem(13, InventoryItem.of(new ItemBuilder(instance.getConfig().getString("view.rewards.material"))
+                        .name(instance.getConfig().getString("view.rewards.name"))
+                        .setLore(instance.getConfig().getStringList("view.rewards.lore"))
+                        .wrap())
                 .defaultCallback(callback -> {
                     player.closeInventory();
                     player.chat("/ligarewards");
                 })
         );
 
-        editor.setItem(14, InventoryItem.of(new ItemBuilder("/texture/e34a592a79397a8df3997c43091694fc2fb76c883a76cce89f0227e5c9f1dfe")
-                        .name("&aRanking da liga")
-                        .setLore(
-                                "&7Veja quais clans estão liderando",
-                                "&7a liga atualmente",
-                                "",
-                                "&aClique para ver o ranking da liga!"
-                        ).wrap())
+        editor.setItem(14, InventoryItem.of(new ItemBuilder(instance.getConfig().getString("view.leagueRank.material"))
+                        .name(instance.getConfig().getString("view.leagueRank.name"))
+                        .setLore(instance.getConfig().getStringList("view.leagueRank.lore"))
+                        .wrap())
                 .defaultCallback(callback -> viewCache.getRankingView().openInventory(player))
         );
 
-        editor.setItem(15, InventoryItem.of(new ItemBuilder("/texture/ab527a18dec3d6dac532f5555b9119c31b7a8397b8a06d249d0eb39241c5485f")
-                .name("&aHistórico de Eventos")
-                .setLore(
-                        "&7Veja os eventos anteriores que",
-                        "&7ocorream na liga e quantos",
-                        "&7pontos foram fornecidos",
-                        "",
-                        "&aClique para ver o histórico!"
-                ).wrap()).defaultCallback(callback -> viewCache.getHistoricView().openInventory(player))
+        editor.setItem(15, InventoryItem.of(new ItemBuilder(instance.getConfig().getString("view.leagueHistoric.material"))
+                .name(instance.getConfig().getString("view.leagueHistoric.name"))
+                .setLore(instance.getConfig().getStringList("view.leagueHistoric.lore"))
+                .wrap())
+                .defaultCallback(callback -> viewCache.getHistoricView().openInventory(player))
         );
     }
 }

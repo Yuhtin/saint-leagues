@@ -18,6 +18,93 @@ reset-time:
 
 discord-webhook-link: ""
 
+view:
+  filterColor: "&b"
+  clanRankingInfo: " &f%time%: &e%pontos% pontos &6(#%position%)"
+  mainInventoryName: "Saint Ligas"
+  leagueHistoric:
+    material: "/texture/ab527a18dec3d6dac532f5555b9119c31b7a8397b8a06d249d0eb39241c5485f"
+    name: "&aHistórico de Eventos"
+    lore:
+      - '&7Veja os eventos anteriores que'
+      - '&7ocorream na liga e quantos'
+      - '&7pontos foram fornecidos'
+      - ''
+      - '&aClique para ver o histórico!'
+  rewards:
+    material: "/texture/a2629f2682dcee30f5855b1e5427cc4bee73d18a276fafc520d693b40ca81b22"
+    name: "&aRecompensas"
+    lore:
+      - '&7Veja as recompensas que o clan'
+      - '&7pode receber ao final da liga'
+      - ''
+      - '&aClique para ver as recompensas!'
+  leagueRank:
+    material: "/texture/e34a592a79397a8df3997c43091694fc2fb76c883a76cce89f0227e5c9f1dfe"
+    name: "&aRanking da liga"
+    lore:
+      - '&7Veja quais clans estão liderando'
+      - '&7a liga atualmente'
+      - ''
+      - '&aClique para ver o ranking da liga!'
+  profile:
+    name: "&aSeu Perfil"
+    noClanLore:
+      - '&fSeus pontos: &e%pontos%'
+      - '&fSeu clan: &cNenhum'
+      - ''
+      - '&aClique para ver os eventos que participou!'
+    clanLore:
+      - '&fSeus pontos: &e%pontos%'
+      - '&fSeu clan: &e%clan%'
+      - ''
+      - '%info%'
+      - ''
+      - '&aClique para ver os eventos que participou!'
+  ranking:
+    name: "&a%clan% &6(#%position%)"
+    lore:
+      - '&fPontos: &e%pontos%'
+      - '&fParticipações em eventos: &e%participacoes%'
+  historic:
+    name: "&a%event% &8(#%id%)"
+    lore:
+      - '&fData: &e%data%'
+      - '&fPontos: &e%pontos%'
+      - ''
+      - '&fClan vencedor: &e%clan%'
+      - '&fJogadores do clan: &e%players%'
+  period:
+    material: "SUNFLOWER"
+    name: "&6Selecionar período"
+    lore:
+      - '&7Selecione o período que deseja ver'
+      - ''
+      - '%info%'
+      - ''
+      - '&aClique para mudar o período.'
+  sortRanking:
+    material: "HOPPER"
+    name: "&6Filtrar eventos"
+    lore:
+      - '&7Selecione o evento que deseja ver'
+      - ''
+      - '%info%'
+      - ''
+      - '&aClique para mudar o evento.'
+
+webhook:
+  title: "SAINT LIGA - %clan% <a:1Espada:1149729957434634403>"
+  description: "O clã %clan% ganhou %pontos% pontos por %motivo%."
+  footer: "Que a vitória seja dos mais fortes! Rede Saint"
+  color: "16711680"
+  fields:
+    clan: "CLAN||%clan%"
+    points: "PONTOS||%pontos%"
+    motivo: "MOTIVO||%motivo%"
+    mensal: "PONTUAÇÃO MENSAL||%mensal-points% pontos - #%mensal-position%º"
+    trimestral: "PONTUAÇÃO TRIMESTRAL||%trimestral-points% pontos - #%trimestral-position%º"
+
 # Sistema para premiar mensalmente o top clan (1º 2º e 3º lugar)
 auto-reward:
   # Placeholders: $clanTag $player
@@ -102,4 +189,4 @@ reward-per-event:
       points: 3
 
 
-top-locations: []
+top-locations: [ ]

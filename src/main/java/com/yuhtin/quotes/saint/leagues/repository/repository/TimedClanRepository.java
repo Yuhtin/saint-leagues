@@ -23,8 +23,7 @@ public class TimedClanRepository {
     private final SQLExecutor sqlExecutor;
     private final IntervalTime intervalTime;
 
-    @Setter
-    private long initialTime;
+    @Setter private long initialTime = -1;
 
     private final List<String> ranking = new ArrayList<>();
 
@@ -100,7 +99,7 @@ public class TimedClanRepository {
     }
 
     public long getFinalTime() {
-        return LeaguesPlugin.getInstance().getConfig().getLong("reset-time." + this.intervalTime.name());
+        return LeaguesPlugin.getInstance().getConfig().getLong("reset-time." + intervalTime.name());
     }
 
     public String getTable() {
